@@ -1,0 +1,236 @@
+/* ============================================================
+   QUIET UTILITY — Design Tokens
+   Warm editorial minimalism for a modern utilities web app.
+   Foundation: colors, typography, spacing, radii, shadows.
+   ============================================================ */
+
+/* --- Webfonts (CDN — app is hosted online, so this is fine) --- */
+@import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..800;1,400..600&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+:root {
+  /* ----------------------------------------------------------
+     COLOR — Core palette (from brand swatch)
+     ---------------------------------------------------------- */
+  --feather-white: #faf9f6; /* lightest neutral */
+  --porcelain-mist: #f4f1ea; /* warm canvas */
+  --creamed-oat: #e6dac8; /* soft fill */
+  --soft-sandstone: #cbb9a4; /* signature warm tone */
+
+  /* Extended warm neutrals (harmonized, derived from palette) */
+  --clay: #b49a78; /* deeper sandstone — primary action */
+  --clay-strong: #9c8059; /* pressed / hover-darken */
+  --stone: #a99e8d; /* muted tertiary */
+  --espresso: #2e2823; /* darkest warm ink */
+  --espresso-soft: #3d352b;
+
+  /* ----------------------------------------------------------
+     COLOR — Semantic surfaces & ink
+     ---------------------------------------------------------- */
+  --bg-canvas: #f4f1ea; /* page background */
+  --bg-sunken: #f3eee4; /* wells, insets, tracks (light) */
+  --surface: #faf9f6; /* cards, panels */
+  --surface-raised: #ffffff; /* modals, popovers, elevated */
+
+  --ink: #9a8b74; /* primary text — very light warm taupe */
+  --ink-2: #bcae99; /* secondary text */
+  --ink-3: #d4caba; /* placeholder / tertiary */
+  --ink-inverse: #faf9f6; /* text on dark/clay */
+
+  /* Borders & lines */
+  --border: #e7ddcd; /* default hairline */
+  --border-strong: #e0d5c2; /* emphasized / focus ring base */
+  --hairline: rgba(46, 40, 35, 0.08);
+
+  /* ----------------------------------------------------------
+     COLOR — Brand / interactive
+     ---------------------------------------------------------- */
+  --accent: #cbb9a4; /* light clay / sandstone — primary buttons, active */
+  --accent-hover: #c0ab8f;
+  --accent-press: #b49a78;
+  --accent-soft: #efe8dc; /* selected bg, soft chips */
+  --accent-softer: #f7f3ec; /* hover bg, subtle tint */
+  --focus-ring: rgba(203, 185, 164, 0.55);
+  --on-accent: #2e2823; /* dark text/icons on the light accent */
+
+  /* ----------------------------------------------------------
+     COLOR — Retro spectrum (brand palette)
+     ---------------------------------------------------------- */
+  --rust: #a9503b; /* terracotta red */
+  --burnt: #ce8a52; /* burnt orange */
+  --cream: #e6e0d2; /* warm cream */
+  --sage: #91a38d; /* sage green */
+  --slate-blue: #5e7b8e; /* dusty slate blue */
+  --navy: #41506e; /* deep navy */
+  --charcoal: #2c2d35; /* near-black charcoal */
+  --greige: #d9d3c5; /* greige neutral ground */
+
+  /* ----------------------------------------------------------
+     COLOR — Status (mapped to the retro spectrum)
+     ---------------------------------------------------------- */
+  --success: #91a38d;
+  --success-soft: #e8ece4;
+  --warning: #ce8a52;
+  --warning-soft: #f6eada;
+  --danger: #a9503b;
+  --danger-soft: #f1dfd8;
+  --info: #5e7b8e;
+  --info-soft: #e3e9ec;
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY — Families
+     ---------------------------------------------------------- */
+  --font-sans:
+    "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Type scale (1.250 major-third-ish, tuned) */
+  --text-display: 3.5rem; /* 56 */
+  --text-h1: 2.5rem; /* 40 */
+  --text-h2: 1.875rem; /* 30 */
+  --text-h3: 1.375rem; /* 22 */
+  --text-h4: 1.125rem; /* 18 */
+  --text-lg: 1.125rem; /* 18 */
+  --text-base: 1rem; /* 16 */
+  --text-sm: 0.875rem; /* 14 */
+  --text-xs: 0.75rem; /* 12 */
+  --text-label: 0.6875rem; /* 11 — wide-tracked uppercase labels */
+
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.7;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.08em;
+  --tracking-label: 0.18em; /* signature uppercase-label tracking */
+
+  /* ----------------------------------------------------------
+     SPACING — 4px base
+     ---------------------------------------------------------- */
+  --space-1: 0.25rem; /* 4  */
+  --space-2: 0.5rem; /* 8  */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem; /* 16 */
+  --space-5: 1.25rem; /* 20 */
+  --space-6: 1.5rem; /* 24 */
+  --space-8: 2rem; /* 32 */
+  --space-10: 2.5rem; /* 40 */
+  --space-12: 3rem; /* 48 */
+  --space-16: 4rem; /* 64 */
+  --space-20: 5rem; /* 80 */
+
+  /* ----------------------------------------------------------
+     RADII — soft, generous (echoes the swatch cards)
+     ---------------------------------------------------------- */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* ----------------------------------------------------------
+     SHADOWS — whisper-soft, warm-tinted (espresso, not gray)
+     ---------------------------------------------------------- */
+  --shadow-xs: 0 1px 2px rgba(46, 40, 35, 0.05);
+  --shadow-sm: 0 2px 6px -2px rgba(46, 40, 35, 0.07);
+  --shadow-md: 0 6px 20px -6px rgba(46, 40, 35, 0.1);
+  --shadow-lg: 0 16px 44px -12px rgba(46, 40, 35, 0.14);
+  --shadow-focus: 0 0 0 3px var(--focus-ring);
+
+  /* ----------------------------------------------------------
+     MOTION — gentle, no bounce
+     ---------------------------------------------------------- */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 360ms;
+}
+
+/* ============================================================
+   SEMANTIC TYPE CLASSES
+   ============================================================ */
+.ds-display {
+  font-family: var(--font-sans);
+  font-size: var(--text-display);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+.ds-h1 {
+  font-family: var(--font-sans);
+  font-size: var(--text-h1);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+.ds-h2 {
+  font-family: var(--font-sans);
+  font-size: var(--text-h2);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+.ds-h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-h3);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  color: var(--ink);
+}
+.ds-h4 {
+  font-family: var(--font-sans);
+  font-size: var(--text-h4);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  color: var(--ink);
+}
+.ds-body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--ink-2);
+}
+.ds-body-sm {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--ink-2);
+}
+.ds-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.ds-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.ds-readout {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-medium);
+  font-size: var(--text-display);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
