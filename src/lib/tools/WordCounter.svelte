@@ -34,7 +34,7 @@
         <div class="stat"><div class="stat-num">{s.n}</div><div class="stat-label">{s.l}</div></div>
       {/each}
     </div>
-    <div class="field">
+    <div class="field bare-field">
       <span class="field-label">Your text</span>
       <textarea
         class="textarea"

@@ -5,6 +5,7 @@
   import Base64Tool from './lib/tools/Base64Tool.svelte';
   import CaseConverter from './lib/tools/CaseConverter.svelte';
   import ColorTool from './lib/tools/ColorTool.svelte';
+  import GuidGenerator from './lib/tools/GuidGenerator.svelte';
   import Home from './lib/tools/Home.svelte';
   import Timer from './lib/tools/Timer.svelte';
   import UnitConverter from './lib/tools/UnitConverter.svelte';
@@ -29,7 +30,7 @@
 </script>
 
 <div class="app">
-  <TopBar {query} {onQuery}>
+  <TopBar {query} {onQuery} onHome={() => navigate('home')}>
     {#snippet left()}
       <Menu active={view} {convCat} onNavigate={navigate} />
     {/snippet}
@@ -50,6 +51,8 @@
       <CaseConverter onBack={back} />
     {:else if view === 'base64'}
       <Base64Tool onBack={back} />
+    {:else if view === 'guid'}
+      <GuidGenerator onBack={back} />
     {/if}
   </div>
 

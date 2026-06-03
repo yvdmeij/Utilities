@@ -1,6 +1,7 @@
 import {
   Binary,
   CaseSensitive,
+  Fingerprint,
   Palette,
   Pilcrow,
   Ruler,
@@ -52,6 +53,12 @@ export const TOOLS: Tool[] = [
     name: 'Base64',
     icon: Binary,
     desc: 'Encode & decode text.',
+  },
+  {
+    id: 'guid',
+    name: 'GUID generator',
+    icon: Fingerprint,
+    desc: 'Random UUID v4 — copy any.',
     badge: 'New',
   },
 ];
