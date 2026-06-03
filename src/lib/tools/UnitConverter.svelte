@@ -105,9 +105,9 @@
   >
     <div>
       <div class="field-label" style="margin-bottom:12px">Result</div>
-      <div class="readout" style="font-size:44px">
+      <div class="readout conv-readout">
         {result === null ? '—' : fmt(result)}
-        <span style="font-size:20px;color:var(--ink-3);margin-left:10px">{to.toLowerCase()}</span>
+        <span class="conv-unit">{to.toLowerCase()}</span>
       </div>
     </div>
     <Button variant="primary" icon={Copy} onclick={() => result !== null && copy(fmt(result))}>

@@ -43,11 +43,11 @@
       />
     </div>
     <div class="grid-2">
-      <div class="field">
+      <div class="field bare-field">
         <span class="field-label">Input</span>
         <textarea class="textarea" bind:value={text} placeholder="Type something…"></textarea>
       </div>
-      <div class="field">
+      <div class="field bare-field">
         <span class="field-label">Output</span>
         <textarea class="textarea" value={out} readonly placeholder="Result appears here"></textarea>
       </div>

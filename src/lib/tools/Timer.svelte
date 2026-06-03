@@ -53,7 +53,7 @@
 
 <div class="content-inner fade-up">
   <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> All tools</button>
-  <div class="page-head">
+  <div class="page-head center">
     <div class="eyebrow">Focus</div>
     <h1 class="page-title"><b>Timer</b></h1>
   </div>

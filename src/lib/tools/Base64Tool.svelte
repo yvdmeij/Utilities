@@ -39,13 +39,15 @@
       />
     </div>
     <div class="grid-2">
-      <div class="field">
+      <div class="field bare-field">
         <span class="field-label">{mode === 'encode' ? 'Plain text' : 'Base64'}</span>
-        <textarea class="textarea input-mono" bind:value={text} placeholder="Paste here…"></textarea>
+        <textarea class="textarea input-mono bare" bind:value={text} placeholder="Paste here…"
+        ></textarea>
       </div>
-      <div class="field">
+      <div class="field bare-field">
         <span class="field-label">{mode === 'encode' ? 'Base64' : 'Plain text'}</span>
-        <textarea class="textarea input-mono" value={out} readonly placeholder="Result"></textarea>
+        <textarea class="textarea input-mono bare" value={out} readonly placeholder="Result"
+        ></textarea>
       </div>
     </div>
     <div style="display:flex;justify-content:flex-end;margin-top:18px">
