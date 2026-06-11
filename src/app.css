@@ -60,10 +60,12 @@ textarea {
 .menu-trigger {
   position: relative;
   z-index: 45;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  padding: 0;
   border: none;
   cursor: pointer;
   background: transparent;
@@ -111,54 +113,79 @@ textarea {
 /* --- Compact pill menu (home) --- */
 .menu-pill {
   position: absolute;
-  top: calc(100% + 12px);
+  top: 0;
   right: 0;
   z-index: 40;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
-  transform-origin: top right;
-  animation: menu-pop var(--dur) var(--ease-out);
+  align-items: center;
+  gap: 2px;
+  /* top padding reserves the trigger's (×) slot so the icons stack below it */
+  padding: 42px 0 2px;
+  transform-origin: top center;
+  animation: pill-in var(--dur-slow) var(--ease-out) both;
+}
+.pill-item {
+  animation: pill-item-in var(--dur-slow) var(--ease-out) both;
+}
+.pill-item:nth-child(1) {
+  animation-delay: 60ms;
+}
+.pill-item:nth-child(2) {
+  animation-delay: 120ms;
+}
+@keyframes pill-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pill-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 760px) {
+  .menu-pill {
+    background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
+    backdrop-filter: blur(16px) saturate(1.6);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    border-radius: var(--r-lg);
+    box-shadow: 0 8px 32px -4px rgba(46, 40, 35, 0.14);
+  }
 }
 .pill-item {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   background: transparent;
   border: none;
   cursor: pointer;
-  color: var(--ink-2);
+  color: var(--ink);
+  border-radius: var(--r-md);
   transition: color var(--dur) var(--ease);
 }
 .pill-ico {
-  width: 36px;
-  height: 36px;
-  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .pill-label {
-  max-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  opacity: 0;
-  font-size: 14px;
-  font-weight: 500;
-  padding-right: 12px;
-  transition:
-    max-width var(--dur) var(--ease),
-    padding var(--dur) var(--ease),
-    opacity var(--dur) var(--ease);
+  display: none;
 }
 .pill-item:hover {
-  color: var(--ink);
-}
-.pill-item:hover .pill-label {
-  max-width: 140px;
-  padding-left: 16px;
-  opacity: 1;
+  color: var(--clay-strong);
 }
 @keyframes menu-pop {
   from {
@@ -393,7 +420,7 @@ textarea {
   color: var(--ink);
 }
 .search input::placeholder {
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 
 .content {
@@ -474,11 +501,11 @@ textarea {
   font-family: var(--font-serif);
   font-size: 20px;
   font-weight: 500;
-  color: var(--ink-2);
+  color: #8a7e6d;
   transition: color var(--dur) var(--ease);
 }
 .tool-row:hover .tool-row-name {
-  color: var(--ink);
+  color: color-mix(in srgb, #8a7e6d 75%, #000);
 }
 .tool-row-desc {
   flex: none;
@@ -511,13 +538,11 @@ textarea {
   /* A lone last item (odd count) spans both columns, centered */
   .tool-row:last-child:nth-child(odd) {
     grid-column: 1 / -1;
-    width: fit-content;
+    width: calc(50% - 36px);
     margin-inline: auto;
-    justify-content: center;
-    gap: 22px;
   }
   .tool-row:last-child:nth-child(odd):hover {
-    padding-left: 0;
+    padding-left: 12px;
   }
 }
 
