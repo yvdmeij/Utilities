@@ -52,11 +52,9 @@
     {#if active === 'home'}
       <div class="menu-pill">
         <button class="pill-item" onclick={showSettings}>
-          <span class="pill-label">Settings</span>
           <span class="pill-ico"><Settings size={18} /></span>
         </button>
         <button class="pill-item" onclick={() => (open = false)}>
-          <span class="pill-label">About</span>
           <span class="pill-ico"><CircleHelp size={18} /></span>
         </button>
       </div>
