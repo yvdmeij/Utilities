@@ -31,9 +31,9 @@
   --surface: #faf9f6; /* cards, panels */
   --surface-raised: #ffffff; /* modals, popovers, elevated */
 
-  --ink: #9a8b74; /* primary text — very light warm taupe */
-  --ink-2: #bcae99; /* secondary text */
-  --ink-3: #d4caba; /* placeholder / tertiary */
+  --ink: #54453a; /* primary text — warm dark brown */
+  --ink-2: #7d6e5f; /* secondary text */
+  --ink-3: #a8998a; /* placeholder / tertiary */
   --ink-inverse: #faf9f6; /* text on dark/clay */
 
   /* Borders & lines */
