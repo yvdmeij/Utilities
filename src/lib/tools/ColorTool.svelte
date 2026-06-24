@@ -361,6 +361,11 @@
     if (file) loadImage(file);
   }
 
+  function handleDragOver(e: DragEvent) {
+    e.preventDefault();
+    dragOver = true;
+  }
+
   function handleDrop(e: DragEvent) {
     e.preventDefault();
     dragOver = false;
