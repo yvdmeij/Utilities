@@ -14,6 +14,12 @@
   let view = $state('home');
   let query = $state('');
   let convCat = $state('Length');
+  let dark = $state(localStorage.getItem('theme') === 'dark');
+
+  $effect(() => {
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+  });
 
   function navigate(id: string, extra?: { cat?: string }) {
     query = '';
@@ -30,9 +36,11 @@
 </script>
 
 <div class="app">
-  <TopBar {query} {onQuery} onHome={() => navigate('home')}>
+  <TopBar {query} {onQuery} onHome={() => navigate('home')} {dark} onToggleDark={() => (dark = !dark)}>
     {#snippet left()}
-      <Menu active={view} {convCat} onNavigate={navigate} />
+      {#if view !== 'home'}
+        <Menu active={view} {convCat} onNavigate={navigate} />
+      {/if}
     {/snippet}
   </TopBar>
 

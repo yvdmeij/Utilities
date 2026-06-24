@@ -12,7 +12,7 @@
 
 <div class="content-inner">
   <div class="page-head home-head fade-up">
-    <h1 class="page-title">Small tools, <b>done well.</b></h1>
+    <h1 class="page-title">Simple tools, <b>done well.</b></h1>
   </div>
 
   {#if q}
