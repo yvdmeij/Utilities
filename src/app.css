@@ -70,7 +70,9 @@ textarea {
   color: var(--ink-2);
   border-radius: var(--r-sm);
   flex: none;
-  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+  transition:
+    color var(--dur) var(--ease),
+    background var(--dur) var(--ease);
 }
 .theme-toggle:hover {
   color: var(--ink);
@@ -966,7 +968,10 @@ textarea {
   color: var(--ink-3);
   font-size: 14px;
   text-align: center;
-  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition:
+    border-color var(--dur) var(--ease),
+    background var(--dur) var(--ease),
+    color var(--dur) var(--ease);
 }
 .image-drop-zone:hover,
 .image-drop-zone.dragover {
@@ -995,7 +1000,9 @@ textarea {
   position: absolute;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(0, 0, 0, 0.1);
   cursor: crosshair;
   z-index: 10;
 }
