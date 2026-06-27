@@ -1,4 +1,5 @@
 import {
+  Banknote,
   Binary,
   CaseSensitive,
   Fingerprint,
@@ -19,22 +20,35 @@ export interface Tool {
 
 export const TOOLS: Tool[] = [
   {
-    id: 'converter',
-    name: 'Unit converter',
-    icon: Ruler,
-    desc: 'Length · Weight · Volume',
-  },
-  {
-    id: 'timer',
-    name: 'Timer',
-    icon: Timer,
-    desc: 'Focus · Countdown',
+    id: 'currency',
+    name: 'Currency converter',
+    icon: Banknote,
+    desc: 'USD · EUR · GBP',
+    badge: 'New',
   },
   {
     id: 'color',
     name: 'Color picker',
     icon: Palette,
     desc: 'HEX · RGB · HSL',
+  },
+  {
+    id: 'converter',
+    name: 'Unit converter',
+    icon: Ruler,
+    desc: 'Length · Weight · Volume',
+  },
+  {
+    id: 'guid',
+    name: 'GUID generator',
+    icon: Fingerprint,
+    desc: 'UUID v4',
+  },
+  {
+    id: 'timer',
+    name: 'Timer',
+    icon: Timer,
+    desc: 'Focus · Countdown',
   },
   {
     id: 'counter',
@@ -53,12 +67,5 @@ export const TOOLS: Tool[] = [
     name: 'Base64',
     icon: Binary,
     desc: 'Encode · Decode',
-  },
-  {
-    id: 'guid',
-    name: 'GUID generator',
-    icon: Fingerprint,
-    desc: 'UUID v4',
-    badge: 'New',
   },
 ];

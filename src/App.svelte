@@ -5,6 +5,7 @@
   import Base64Tool from './lib/tools/Base64Tool.svelte';
   import CaseConverter from './lib/tools/CaseConverter.svelte';
   import ColorTool from './lib/tools/ColorTool.svelte';
+  import CurrencyConverter from './lib/tools/CurrencyConverter.svelte';
   import GuidGenerator from './lib/tools/GuidGenerator.svelte';
   import Home from './lib/tools/Home.svelte';
   import Timer from './lib/tools/Timer.svelte';
@@ -36,7 +37,13 @@
 </script>
 
 <div class="app">
-  <TopBar {query} {onQuery} onHome={() => navigate('home')} {dark} onToggleDark={() => (dark = !dark)}>
+  <TopBar
+    {query}
+    {onQuery}
+    onHome={() => navigate('home')}
+    {dark}
+    onToggleDark={() => (dark = !dark)}
+  >
     {#snippet left()}
       {#if view !== 'home'}
         <Menu active={view} {convCat} onNavigate={navigate} />
@@ -47,20 +54,22 @@
   <div class="content">
     {#if view === 'home'}
       <Home {query} onOpen={navigate} />
-    {:else if view === 'converter'}
-      <UnitConverter onBack={back} initialCat={convCat} />
-    {:else if view === 'timer'}
-      <Timer onBack={back} />
+    {:else if view === 'currency'}
+      <CurrencyConverter onBack={back} />
     {:else if view === 'color'}
       <ColorTool onBack={back} />
+    {:else if view === 'converter'}
+      <UnitConverter onBack={back} initialCat={convCat} />
+    {:else if view === 'guid'}
+      <GuidGenerator onBack={back} />
+    {:else if view === 'timer'}
+      <Timer onBack={back} />
     {:else if view === 'counter'}
       <WordCounter onBack={back} />
     {:else if view === 'case'}
       <CaseConverter onBack={back} />
     {:else if view === 'base64'}
       <Base64Tool onBack={back} />
-    {:else if view === 'guid'}
-      <GuidGenerator onBack={back} />
     {/if}
   </div>
 
