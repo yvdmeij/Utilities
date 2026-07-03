@@ -15,7 +15,11 @@
   let view = $state('home');
   let query = $state('');
   let convCat = $state('Length');
-  let dark = $state(localStorage.getItem('theme') === 'dark');
+  const storedTheme = localStorage.getItem('theme');
+  // First visit: follow the OS light/dark setting. After that, respect the user's choice.
+  let dark = $state(
+    storedTheme ? storedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
 
   $effect(() => {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
