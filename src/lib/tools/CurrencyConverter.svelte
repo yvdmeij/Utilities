@@ -186,21 +186,37 @@
   }
 
   async function loadRates() {
-    status = 'loading';
     const cached = readCache();
 
-    // Fresh cache for today — use it without hitting the network.
-    if (cached && cached.date === today()) {
+    // Show whatever we have cached straight away — even if it's from a previous
+    // day — so the app is usable immediately. This matters most for the iOS
+    // home-screen app, which cold-starts after disuse: blocking on a fresh
+    // network round-trip there can take several seconds, while a day-old rate is
+    // perfectly fine to show meanwhile.
+    if (cached) {
       rates = cached.rates;
       rateDate = cached.rateDate;
       status = 'ready';
-      return;
+      // Fresh for today — nothing to revalidate, skip the network entirely.
+      if (cached.date === today()) return;
+    } else {
+      status = 'loading';
     }
 
     try {
-      const res = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR');
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+      // Guard against a hung connection leaving us stuck on the loading state.
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      let data: { date: string; rates: Record<string, number> };
+      try {
+        const res = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR', {
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        data = await res.json();
+      } finally {
+        clearTimeout(timer);
+      }
       const map = { EUR: 1, ...data.rates } as Record<string, number>;
       rates = map;
       rateDate = data.date;
@@ -214,14 +230,9 @@
         // Ignore storage failures (private mode, quota) — rates still work this session.
       }
     } catch {
-      // Network failed: fall back to a stale cache if we have one.
-      if (cached) {
-        rates = cached.rates;
-        rateDate = cached.rateDate;
-        status = 'ready';
-      } else {
-        status = 'error';
-      }
+      // Network failed or timed out. If we already showed cached rates above,
+      // just keep them; otherwise there's nothing to display.
+      status = cached ? 'ready' : 'error';
     }
   }
 

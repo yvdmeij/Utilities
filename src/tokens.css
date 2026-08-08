@@ -8,6 +8,12 @@
 @import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Geist+Mono:wght@300;400;500;600;700&display=swap");
 
 :root {
+  /* Tell the browser to render native controls (select popups, scrollbars,
+     form widgets) in light mode. Overridden to dark below. Without this the
+     native <option> dropdown renders light even in dark theme on browsers
+     that strictly follow color-scheme (e.g. Chromium in a Tesla). */
+  color-scheme: light;
+
   /* ----------------------------------------------------------
      COLOR — Core palette (from brand swatch)
      ---------------------------------------------------------- */
@@ -159,6 +165,8 @@
    DARK MODE — warm espresso overrides
    ============================================================ */
 [data-theme="dark"] {
+  color-scheme: dark;
+
   --bg-canvas: #1c1914;
   --bg-sunken: #161310;
   --surface: #242019;
