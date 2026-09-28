@@ -1,7 +1,16 @@
 <script lang="ts">
-  import { ArrowLeft, ArrowLeftRight, Copy, Plus, RefreshCw, Star, X } from 'lucide-svelte';
+  import {
+    ArrowLeft,
+    ArrowLeftRight,
+    CloudOff,
+    Copy,
+    Plus,
+    RefreshCw,
+    Star,
+    X,
+  } from 'lucide-svelte';
   import Button from '../components/Button.svelte';
-  import { copy } from '../toast';
+  import { copy, toast } from '../toast';
 
   // The ~31 currencies published by the Frankfurter / ECB feed. Names and signs are
   // hardcoded so the dropdown reads nicely without a second network request.
@@ -141,6 +150,7 @@
   let rates = $state<Record<string, number> | null>(null);
   let rateDate = $state('');
   let status = $state<'loading' | 'ready' | 'error'>('loading');
+  let refreshing = $state(false);
   let rows = $state<ConvRow[]>(readRows());
   let favorites = $state<string[]>(readFavorites());
 
@@ -185,6 +195,38 @@
     }
   }
 
+  // Fetch the latest rates and, on success, apply them and write the cache.
+  // `fresh` bypasses the browser's HTTP cache so a manual refresh really asks the
+  // server again instead of getting back the same response.
+  async function fetchRates(fresh = false): Promise<void> {
+    // Guard against a hung connection leaving us stuck on the loading state.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    let data: { date: string; rates: Record<string, number> };
+    try {
+      const res = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR', {
+        signal: controller.signal,
+        cache: fresh ? 'no-store' : 'default',
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      data = await res.json();
+    } finally {
+      clearTimeout(timer);
+    }
+    const map = { EUR: 1, ...data.rates } as Record<string, number>;
+    rates = map;
+    rateDate = data.date;
+    status = 'ready';
+    try {
+      localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({ date: today(), rateDate: data.date, rates: map })
+      );
+    } catch {
+      // Ignore storage failures (private mode, quota) — rates still work this session.
+    }
+  }
+
   async function loadRates() {
     const cached = readCache();
 
@@ -204,35 +246,27 @@
     }
 
     try {
-      // Guard against a hung connection leaving us stuck on the loading state.
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 8000);
-      let data: { date: string; rates: Record<string, number> };
-      try {
-        const res = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR', {
-          signal: controller.signal,
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        data = await res.json();
-      } finally {
-        clearTimeout(timer);
-      }
-      const map = { EUR: 1, ...data.rates } as Record<string, number>;
-      rates = map;
-      rateDate = data.date;
-      status = 'ready';
-      try {
-        localStorage.setItem(
-          CACHE_KEY,
-          JSON.stringify({ date: today(), rateDate: data.date, rates: map })
-        );
-      } catch {
-        // Ignore storage failures (private mode, quota) — rates still work this session.
-      }
+      await fetchRates();
     } catch {
       // Network failed or timed out. If we already showed cached rates above,
       // just keep them; otherwise there's nothing to display.
       status = cached ? 'ready' : 'error';
+    }
+  }
+
+  // Manual refresh: keeps the current rates on screen while fetching, and only
+  // swaps them in once the new ones arrive.
+  async function refreshRates() {
+    if (refreshing) return;
+    refreshing = true;
+    const previousDate = rateDate;
+    try {
+      await fetchRates(true);
+      toast(rateDate === previousDate ? 'Rates already up to date' : 'Rates updated');
+    } catch {
+      toast("Couldn't refresh rates", CloudOff);
+    } finally {
+      refreshing = false;
     }
   }
 
@@ -344,8 +378,17 @@
           {result === null ? '—' : fmt(result)}
           <span class="conv-unit">{to}</span>
         </div>
-        <div class="field-label" style="margin-top:10px;font-weight:500">
+        <div class="rate-meta field-label">
           Updated · {rateDate}
+          <button
+            class="rate-refresh {refreshing ? 'spinning' : ''}"
+            onclick={refreshRates}
+            disabled={refreshing}
+            title={refreshing ? 'Refreshing rates…' : 'Refresh rates'}
+            aria-label="Refresh rates"
+          >
+            <RefreshCw size={13} />
+          </button>
         </div>
       {/if}
     </div>

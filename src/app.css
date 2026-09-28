@@ -838,6 +838,48 @@ textarea {
 .fav-toggle.active {
   color: var(--clay-strong);
 }
+.rate-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-weight: 500;
+}
+.rate-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition:
+    color var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+.rate-refresh:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--accent-softer);
+}
+.rate-refresh:disabled {
+  cursor: default;
+}
+.rate-refresh.spinning svg {
+  animation: rate-spin 0.9s linear infinite;
+}
+@keyframes rate-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rate-refresh.spinning svg {
+    animation: none;
+  }
+}
 .conv-rows {
   display: flex;
   flex-direction: column;
