@@ -9,83 +9,18 @@
     Star,
     X,
   } from 'lucide-svelte';
+  import { untrack } from 'svelte';
   import Button from '../components/Button.svelte';
+  import { CURRENCIES, CURRENCY_SIGNS, fetchRates, type RateData } from '../currency';
+  import { i18n, LANG_CONFIG, locale, type MessageKey, t } from '../i18n.svelte';
   import { copy, toast } from '../toast';
-
-  // The ~31 currencies published by the Frankfurter / ECB feed. Names and signs are
-  // hardcoded so the dropdown reads nicely without a second network request.
-  const CURRENCIES: Record<string, string> = {
-    AUD: 'Australian Dollar',
-    BGN: 'Bulgarian Lev',
-    BRL: 'Brazilian Real',
-    CAD: 'Canadian Dollar',
-    CHF: 'Swiss Franc',
-    CNY: 'Chinese Yuan',
-    CZK: 'Czech Koruna',
-    DKK: 'Danish Krone',
-    EUR: 'Euro',
-    GBP: 'British Pound',
-    HKD: 'Hong Kong Dollar',
-    HUF: 'Hungarian Forint',
-    IDR: 'Indonesian Rupiah',
-    ILS: 'Israeli Shekel',
-    INR: 'Indian Rupee',
-    ISK: 'Icelandic Króna',
-    JPY: 'Japanese Yen',
-    KRW: 'South Korean Won',
-    MXN: 'Mexican Peso',
-    MYR: 'Malaysian Ringgit',
-    NOK: 'Norwegian Krone',
-    NZD: 'New Zealand Dollar',
-    PHP: 'Philippine Peso',
-    PLN: 'Polish Złoty',
-    RON: 'Romanian Leu',
-    SEK: 'Swedish Krona',
-    SGD: 'Singapore Dollar',
-    THB: 'Thai Baht',
-    TRY: 'Turkish Lira',
-    USD: 'US Dollar',
-    ZAR: 'South African Rand',
-  };
-
-  const CURRENCY_SIGNS: Record<string, string> = {
-    AUD: 'A$',
-    BGN: 'лв',
-    BRL: 'R$',
-    CAD: 'C$',
-    CHF: 'CHF',
-    CNY: '¥',
-    CZK: 'Kč',
-    DKK: 'kr',
-    EUR: '€',
-    GBP: '£',
-    HKD: 'HK$',
-    HUF: 'Ft',
-    IDR: 'Rp',
-    ILS: '₪',
-    INR: '₹',
-    ISK: 'kr',
-    JPY: '¥',
-    KRW: '₩',
-    MXN: '$',
-    MYR: 'RM',
-    NOK: 'kr',
-    NZD: 'NZ$',
-    PHP: '₱',
-    PLN: 'zł',
-    RON: 'lei',
-    SEK: 'kr',
-    SGD: 'S$',
-    THB: '฿',
-    TRY: '₺',
-    USD: '$',
-    ZAR: 'R',
-  };
 
   const CACHE_KEY = 'quietkit:currency';
   const ROWS_KEY = 'quietkit:currency:rows';
   const FAVORITES_KEY = 'quietkit:currency:favorites';
-  const codes = Object.keys(CURRENCIES);
+  const SOURCE_LINKS: Record<string, string> = {
+    erapi: 'https://www.exchangerate-api.com',
+  };
 
   function readFavorites(): string[] {
     try {
@@ -144,15 +79,39 @@
     }
   }
 
+  // The active language decides the rate source and which currency leads the list.
+  const config = $derived(LANG_CONFIG[i18n.lang]);
+
   let amount = $state('1');
-  let from = $state('USD');
-  let to = $state('EUR');
+  let from = $state(LANG_CONFIG[i18n.lang].baseCurrency);
+  let to = $state(LANG_CONFIG[i18n.lang].secondCurrency);
   let rates = $state<Record<string, number> | null>(null);
   let rateDate = $state('');
   let status = $state<'loading' | 'ready' | 'error'>('loading');
   let refreshing = $state(false);
   let rows = $state<ConvRow[]>(readRows());
   let favorites = $state<string[]>(readFavorites());
+
+  // Selectable currencies: only those the active source has a rate for, with the
+  // language's base currency first and the rest alphabetical.
+  const codes = $derived(
+    Object.keys(CURRENCIES)
+      .filter((c) => !rates || c in rates)
+      .sort((a, b) =>
+        a === config.baseCurrency ? -1 : b === config.baseCurrency ? 1 : a.localeCompare(b)
+      )
+  );
+
+  const shownFavorites = $derived(favorites.filter((c) => codes.includes(c)));
+
+  const displayNames = $derived.by(() => {
+    try {
+      return new Intl.DisplayNames([locale()], { type: 'currency' });
+    } catch {
+      return null;
+    }
+  });
+  const currencyName = (c: string) => displayNames?.of(c) ?? CURRENCIES[c];
 
   $effect(() => {
     writeRows(rows);
@@ -169,7 +128,15 @@
   }
 
   function addRow() {
-    rows = [...rows, { id: crypto.randomUUID(), amount: '1', from: 'USD', to: 'EUR' }];
+    rows = [
+      ...rows,
+      {
+        id: crypto.randomUUID(),
+        amount: '1',
+        from: config.baseCurrency,
+        to: config.secondCurrency,
+      },
+    ];
   }
 
   function removeRow(id: string) {
@@ -186,49 +153,45 @@
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
-  function readCache(): { date: string; rateDate: string; rates: Record<string, number> } | null {
+  // Each source has its own cache entry, so switching language never mixes base currencies.
+  function readCache(source: string): ({ date: string } & RateData) | null {
     try {
-      const raw = localStorage.getItem(CACHE_KEY);
+      const raw = localStorage.getItem(`${CACHE_KEY}:${source}`);
       return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
     }
   }
 
-  // Fetch the latest rates and, on success, apply them and write the cache.
-  // `fresh` bypasses the browser's HTTP cache so a manual refresh really asks the
-  // server again instead of getting back the same response.
-  async function fetchRates(fresh = false): Promise<void> {
-    // Guard against a hung connection leaving us stuck on the loading state.
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
-    let data: { date: string; rates: Record<string, number> };
-    try {
-      const res = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR', {
-        signal: controller.signal,
-        cache: fresh ? 'no-store' : 'default',
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      data = await res.json();
-    } finally {
-      clearTimeout(timer);
-    }
-    const map = { EUR: 1, ...data.rates } as Record<string, number>;
-    rates = map;
-    rateDate = data.date;
+  // Apply fetched rates, unless the language (and so the source) changed meanwhile.
+  function applyRates(source: string, data: RateData): boolean {
+    if (source !== config.source) return false;
+    rates = data.rates;
+    rateDate = data.rateDate;
     status = 'ready';
+    // A saved selection may not exist in this source (e.g. a dropped currency).
+    if (!(from in data.rates)) from = config.baseCurrency;
+    if (!(to in data.rates)) to = config.secondCurrency;
+    for (const r of rows) {
+      if (!(r.from in data.rates)) r.from = config.baseCurrency;
+      if (!(r.to in data.rates)) r.to = config.secondCurrency;
+    }
+    return true;
+  }
+
+  async function fetchAndCache(source: typeof config.source, fresh = false): Promise<void> {
+    const data = await fetchRates(source, fresh);
+    if (!applyRates(source, data)) return;
     try {
-      localStorage.setItem(
-        CACHE_KEY,
-        JSON.stringify({ date: today(), rateDate: data.date, rates: map })
-      );
+      localStorage.setItem(`${CACHE_KEY}:${source}`, JSON.stringify({ date: today(), ...data }));
     } catch {
       // Ignore storage failures (private mode, quota) — rates still work this session.
     }
   }
 
   async function loadRates() {
-    const cached = readCache();
+    const source = config.source;
+    const cached = readCache(source);
 
     // Show whatever we have cached straight away — even if it's from a previous
     // day — so the app is usable immediately. This matters most for the iOS
@@ -236,21 +199,20 @@
     // network round-trip there can take several seconds, while a day-old rate is
     // perfectly fine to show meanwhile.
     if (cached) {
-      rates = cached.rates;
-      rateDate = cached.rateDate;
-      status = 'ready';
+      applyRates(source, cached);
       // Fresh for today — nothing to revalidate, skip the network entirely.
       if (cached.date === today()) return;
     } else {
+      rates = null;
       status = 'loading';
     }
 
     try {
-      await fetchRates();
+      await fetchAndCache(source);
     } catch {
       // Network failed or timed out. If we already showed cached rates above,
       // just keep them; otherwise there's nothing to display.
-      status = cached ? 'ready' : 'error';
+      if (source === config.source) status = cached ? 'ready' : 'error';
     }
   }
 
@@ -261,32 +223,42 @@
     refreshing = true;
     const previousDate = rateDate;
     try {
-      await fetchRates(true);
-      toast(rateDate === previousDate ? 'Rates already up to date' : 'Rates updated');
+      await fetchAndCache(config.source, true);
+      toast(
+        rateDate === previousDate ? t('currency.latest', { date: rateDate }) : t('currency.updated')
+      );
     } catch {
-      toast("Couldn't refresh rates", CloudOff);
+      toast(t('currency.refreshFailed'), CloudOff);
     } finally {
       refreshing = false;
     }
   }
 
+  // Runs on mount and whenever the language changes: reset to that language's
+  // currencies and load rates from its source.
   $effect(() => {
-    loadRates();
+    const c = config;
+    untrack(() => {
+      from = c.baseCurrency;
+      to = c.secondCurrency;
+      loadRates();
+    });
   });
 
   function convert(amountStr: string, fromCode: string, toCode: string): number | null {
     if (!rates) return null;
     const f = rates[fromCode];
-    const t = rates[toCode];
-    const n = Number.parseFloat(amountStr);
-    if (Number.isNaN(n) || f === undefined || t === undefined) return null;
-    return (n * t) / f;
+    const tr = rates[toCode];
+    // Accept a decimal comma, as typed on Norwegian and Dutch keyboards.
+    const n = Number.parseFloat(amountStr.replace(',', '.'));
+    if (Number.isNaN(n) || f === undefined || tr === undefined) return null;
+    return (n * tr) / f;
   }
 
   const result = $derived.by(() => convert(amount, from, to));
 
   const fmt = (x: number) =>
-    x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+    x.toLocaleString(locale(), { minimumFractionDigits: 2, maximumFractionDigits: 4 });
 
   function swap() {
     [from, to] = [to, from];
@@ -294,27 +266,27 @@
 </script>
 
 <div class="content-inner fade-up">
-  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> All tools</button>
+  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> {t('menu.allTools')}</button>
   <div class="page-head">
-    <div class="eyebrow">Convert</div>
-    <h1 class="page-title"><b>Currency converter</b></h1>
+    <div class="eyebrow">{t('eyebrow.convert')}</div>
+    <h1 class="page-title"><b>{t('currency.title')}</b></h1>
   </div>
 
   {#snippet currencyOptions()}
-    {#if favorites.length}
-      <optgroup label="Favorites">
-        {#each favorites as c (c)}
-          <option value={c}>{c} ({CURRENCY_SIGNS[c]}) — {CURRENCIES[c]}</option>
+    {#if shownFavorites.length}
+      <optgroup label={t('currency.favorites')}>
+        {#each shownFavorites as c (c)}
+          <option value={c}>{c} ({CURRENCY_SIGNS[c]}) — {currencyName(c)}</option>
         {/each}
       </optgroup>
-      <optgroup label="All currencies">
-        {#each codes.filter((c) => !favorites.includes(c)) as c (c)}
-          <option value={c}>{c} ({CURRENCY_SIGNS[c]}) — {CURRENCIES[c]}</option>
+      <optgroup label={t('currency.all')}>
+        {#each codes.filter((c) => !shownFavorites.includes(c)) as c (c)}
+          <option value={c}>{c} ({CURRENCY_SIGNS[c]}) — {currencyName(c)}</option>
         {/each}
       </optgroup>
     {:else}
       {#each codes as c (c)}
-        <option value={c}>{c} ({CURRENCY_SIGNS[c]}) — {CURRENCIES[c]}</option>
+        <option value={c}>{c} ({CURRENCY_SIGNS[c]}) — {currencyName(c)}</option>
       {/each}
     {/if}
   {/snippet}
@@ -322,7 +294,7 @@
   <div class="panel">
     <div class="swap-row">
       <div class="field" style="flex:1">
-        <span class="field-label">From</span>
+        <span class="field-label">{t('common.from')}</span>
         <div class="unit-field">
           <input
             value={amount}
@@ -335,16 +307,20 @@
           <button
             class="fav-toggle {favorites.includes(from) ? 'active' : ''}"
             onclick={() => toggleFavorite(from)}
-            title={favorites.includes(from) ? 'Remove from favorites' : 'Add to favorites'}
-            aria-label="Toggle favorite"
+            title={favorites.includes(from)
+              ? t('currency.removeFavorite')
+              : t('currency.addFavorite')}
+            aria-label={t('currency.toggleFavorite')}
           >
             <Star size={15} fill={favorites.includes(from) ? 'currentColor' : 'none'} />
           </button>
         </div>
       </div>
-      <button class="swap-btn" onclick={swap} title="Swap"><ArrowLeftRight size={17} /></button>
+      <button class="swap-btn" onclick={swap} title={t('common.swap')}
+        ><ArrowLeftRight size={17} /></button
+      >
       <div class="field" style="flex:1">
-        <span class="field-label">To</span>
+        <span class="field-label">{t('common.to')}</span>
         <div class="unit-field">
           <input value={result === null ? '' : fmt(result)} readonly />
           <select class="unit-select" bind:value={to}>
@@ -353,8 +329,10 @@
           <button
             class="fav-toggle {favorites.includes(to) ? 'active' : ''}"
             onclick={() => toggleFavorite(to)}
-            title={favorites.includes(to) ? 'Remove from favorites' : 'Add to favorites'}
-            aria-label="Toggle favorite"
+            title={favorites.includes(to)
+              ? t('currency.removeFavorite')
+              : t('currency.addFavorite')}
+            aria-label={t('currency.toggleFavorite')}
           >
             <Star size={15} fill={favorites.includes(to) ? 'currentColor' : 'none'} />
           </button>
@@ -368,24 +346,37 @@
     style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"
   >
     <div>
-      <div class="field-label" style="margin-bottom:12px">Result</div>
+      <div class="field-label" style="margin-bottom:12px">{t('common.result')}</div>
       {#if status === 'loading'}
-        <div class="readout conv-readout" style="color:var(--ink-2)">Fetching latest rates…</div>
+        <div class="readout conv-readout" style="color:var(--ink-2)">{t('currency.fetching')}</div>
       {:else if status === 'error'}
-        <div class="readout conv-readout" style="color:var(--ink-2)">Rates unavailable</div>
+        <div class="readout conv-readout" style="color:var(--ink-2)">
+          {t('currency.unavailable')}
+        </div>
       {:else}
         <div class="readout conv-readout">
           {result === null ? '—' : fmt(result)}
           <span class="conv-unit">{to}</span>
         </div>
         <div class="rate-meta field-label">
-          Updated · {rateDate}
+          {#if SOURCE_LINKS[config.source]}
+            <a href={SOURCE_LINKS[config.source]} target="_blank" rel="noopener"
+              >{t(
+                `currency.source${config.source[0].toUpperCase()}${config.source.slice(1)}` as MessageKey
+              )}</a
+            >
+          {:else}
+            {t(
+              `currency.source${config.source[0].toUpperCase()}${config.source.slice(1)}` as MessageKey
+            )}
+          {/if}
+          · {rateDate}
           <button
             class="rate-refresh {refreshing ? 'spinning' : ''}"
             onclick={refreshRates}
             disabled={refreshing}
-            title={refreshing ? 'Refreshing rates…' : 'Refresh rates'}
-            aria-label="Refresh rates"
+            title={refreshing ? t('currency.refreshing') : t('currency.refresh')}
+            aria-label={t('currency.refresh')}
           >
             <RefreshCw size={13} />
           </button>
@@ -393,7 +384,8 @@
       {/if}
     </div>
     {#if status === 'error'}
-      <Button variant="secondary" icon={RefreshCw} onclick={loadRates}>Retry</Button>
+      <Button variant="secondary" icon={RefreshCw} onclick={loadRates}>{t('currency.retry')}</Button
+      >
     {:else}
       <Button
         variant="primary"
@@ -401,13 +393,13 @@
         disabled={result === null}
         onclick={() => result !== null && copy(fmt(result))}
       >
-        Copy result
+        {t('common.copyResult')}
       </Button>
     {/if}
   </div>
 
   <div class="panel">
-    <div class="field-label" style="margin-bottom:14px">Other conversions</div>
+    <div class="field-label" style="margin-bottom:14px">{t('currency.other')}</div>
     {#if rows.length}
       <div class="conv-rows">
         {#each rows as row (row.id)}
@@ -426,7 +418,11 @@
                   </select>
                 </div>
               </div>
-              <button class="swap-btn swap-btn-sm" onclick={() => swapRow(row)} title="Swap">
+              <button
+                class="swap-btn swap-btn-sm"
+                onclick={() => swapRow(row)}
+                title={t('common.swap')}
+              >
                 <ArrowLeftRight size={15} />
               </button>
               <div class="field" style="flex:1">
@@ -441,8 +437,8 @@
             <button
               class="row-remove"
               onclick={() => removeRow(row.id)}
-              title="Remove conversion"
-              aria-label="Remove conversion"
+              title={t('currency.remove')}
+              aria-label={t('currency.remove')}
             >
               <X size={16} />
             </button>
@@ -450,6 +446,6 @@
         {/each}
       </div>
     {/if}
-    <Button variant="secondary" icon={Plus} onclick={addRow}>Add conversion</Button>
+    <Button variant="secondary" icon={Plus} onclick={addRow}>{t('currency.add')}</Button>
   </div>
 </div>

@@ -2,6 +2,7 @@
   import { ArrowLeft, Copy, RefreshCw } from 'lucide-svelte';
   import Button from '../components/Button.svelte';
   import Segmented from '../components/Segmented.svelte';
+  import { t } from '../i18n.svelte';
   import { copy } from '../toast';
 
   let { onBack }: { onBack: () => void } = $props();
@@ -40,15 +41,15 @@
 </script>
 
 <div class="content-inner fade-up">
-  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> All tools</button>
+  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> {t('menu.allTools')}</button>
   <div class="page-head">
-    <div class="eyebrow">Generate</div>
-    <h1 class="page-title"><b>GUID generator</b></h1>
+    <div class="eyebrow">{t('eyebrow.generate')}</div>
+    <h1 class="page-title"><b>{t('guid.title')}</b></h1>
   </div>
 
   <div class="panel">
     <div style="margin-bottom:26px">
-      <div class="field-label" style="margin-bottom:11px">How many</div>
+      <div class="field-label" style="margin-bottom:11px">{t('guid.howMany')}</div>
       <Segmented
         options={[
           { value: 1, label: '1' },
@@ -65,26 +66,26 @@
       style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:30px"
     >
       <div>
-        <div class="field-label" style="margin-bottom:11px">Format</div>
+        <div class="field-label" style="margin-bottom:11px">{t('guid.format')}</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <Button variant={upper ? 'primary' : 'ghost'} onclick={() => (upper = !upper)}>
-            Uppercase
+            {t('guid.uppercase')}
           </Button>
           <Button variant={hyphens ? 'primary' : 'ghost'} onclick={() => (hyphens = !hyphens)}>
-            Hyphens
+            {t('guid.hyphens')}
           </Button>
         </div>
       </div>
       <div style="display:flex;gap:10px">
-        <Button variant="secondary" icon={RefreshCw} onclick={regenerate}>Regenerate</Button>
-        <Button variant="primary" icon={Copy} onclick={() => text && copy(text)}>Copy all</Button>
+        <Button variant="secondary" icon={RefreshCw} onclick={regenerate}>{t('guid.regenerate')}</Button>
+        <Button variant="primary" icon={Copy} onclick={() => text && copy(text)}>{t('guid.copyAll')}</Button>
       </div>
     </div>
 
-    <div class="field-label" style="margin-bottom:13px">{count === 1 ? 'Result' : `${count} GUIDs`}</div>
+    <div class="field-label" style="margin-bottom:13px">{count === 1 ? t('common.result') : t('guid.count', { n: count })}</div>
     <div class="guid-list">
       {#each formatted as g, i (i)}
-        <button class="guid-line" onclick={() => copy(g)} title="Click to copy">{g}</button>
+        <button class="guid-line" onclick={() => copy(g)} title={t('guid.clickToCopy')}>{g}</button>
       {/each}
     </div>
   </div>

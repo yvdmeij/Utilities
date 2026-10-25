@@ -1,6 +1,8 @@
 <script lang="ts">
   import { Moon, Search, Sun, X } from 'lucide-svelte';
   import type { Snippet } from 'svelte';
+  import { t } from '../i18n.svelte';
+  import Settings from './Settings.svelte';
 
   let {
     query,
@@ -32,7 +34,7 @@
 
 <header class="topbar">
   <div class="topbar-side">
-    <button class="brand" onclick={() => onHome?.()} aria-label="Quietkit — home">
+    <button class="brand" onclick={() => onHome?.()} aria-label={t('top.home')}>
       <svg
         class="brand-logo"
         xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +61,7 @@
       oninput={(e) => onQuery(e.currentTarget.value)}
       onblur={closeSearch}
       onkeydown={(e) => e.key === 'Escape' && closeSearch()}
-      placeholder="Search tools…"
+      placeholder={t('top.search')}
     />
   </div>
   <div class="topbar-side topbar-side-end">
@@ -67,7 +69,7 @@
       class="search-toggle"
       onmousedown={(e) => e.preventDefault()}
       onclick={() => (searchOpen = !searchOpen)}
-      aria-label={searchOpen ? 'Close search' : 'Search tools'}
+      aria-label={searchOpen ? t('top.closeSearch') : t('top.openSearch')}
     >
       {#if searchOpen}
         <X size={17} strokeWidth={1.75} />
@@ -78,7 +80,7 @@
     <button
       class="theme-toggle"
       onclick={() => onToggleDark?.()}
-      aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={dark ? t('top.toLight') : t('top.toDark')}
     >
       {#if dark}
         <Sun size={17} strokeWidth={1.75} />
@@ -86,6 +88,7 @@
         <Moon size={17} strokeWidth={1.75} />
       {/if}
     </button>
+    <Settings />
     {@render left?.()}
   </div>
 </header>

@@ -1436,3 +1436,7 @@ textarea {
     padding: 32px 18px 56px;
   }
 }
+
+.settings-pop {
+  width: 220px;
+}

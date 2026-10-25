@@ -1,5 +1,6 @@
 import { Check } from 'lucide-svelte';
 import { writable } from 'svelte/store';
+import { t } from './i18n.svelte';
 import type { IconComponent } from './types';
 
 export interface ToastItem {
@@ -23,5 +24,5 @@ export function toast(msg: string, icon: IconComponent = Check): void {
 /** Copy text to the clipboard and confirm with a toast. */
 export function copy(text: string): void {
   navigator.clipboard?.writeText(text);
-  toast('Copied to clipboard');
+  toast(t('common.copied'));
 }

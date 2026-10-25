@@ -2,6 +2,7 @@
   import { ArrowLeft, Bell, Pause, Play, RotateCcw } from 'lucide-svelte';
   import Button from '../components/Button.svelte';
   import Segmented from '../components/Segmented.svelte';
+  import { t } from '../i18n.svelte';
   import { toast } from '../toast';
 
   let { onBack }: { onBack: () => void } = $props();
@@ -25,7 +26,7 @@
         left = 0;
         running = false;
         clearInterval(id);
-        toast("Time's up", Bell);
+        toast(t('timer.timesUp'), Bell);
       }
     }, 1000);
     return () => clearInterval(id);
@@ -52,10 +53,10 @@
 </script>
 
 <div class="content-inner fade-up">
-  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> All tools</button>
+  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> {t('menu.allTools')}</button>
   <div class="page-head center">
-    <div class="eyebrow">Focus</div>
-    <h1 class="page-title"><b>Timer</b></h1>
+    <div class="eyebrow">{t('eyebrow.focus')}</div>
+    <h1 class="page-title"><b>{t('timer.title')}</b></h1>
   </div>
 
   <div class="panel">
@@ -83,16 +84,16 @@
         <div class="time">
           <div class="readout" style="font-size:56px">{mm}:{ss}</div>
           <div class="field-label" style="margin-top:10px">
-            {running ? 'Running' : left === 0 ? 'Done' : 'Paused'}
+            {running ? t('timer.running') : left === 0 ? t('timer.done') : t('timer.paused')}
           </div>
         </div>
       </div>
 
       <div class="timer-controls">
         <Button variant="primary" icon={running ? Pause : Play} onclick={toggle}>
-          {running ? 'Pause' : 'Start'}
+          {running ? t('timer.pause') : t('timer.start')}
         </Button>
-        <Button variant="secondary" icon={RotateCcw} onclick={reset}>Reset</Button>
+        <Button variant="secondary" icon={RotateCcw} onclick={reset}>{t('timer.reset')}</Button>
       </div>
     </div>
   </div>

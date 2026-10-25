@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ArrowLeft, Copy, ImageUp, RotateCcw, ZoomIn } from 'lucide-svelte';
+  import { t } from '../i18n.svelte';
   import { copy } from '../toast';
   import Segmented from '../components/Segmented.svelte';
 
@@ -8,10 +9,10 @@
   const brand = ['#A9503B', '#CE8A52', '#E6E0D2', '#91A38D', '#5E7B8E', '#41506E', '#2C2D35', '#CBB9A4'];
 
   type Mode = 'manual' | 'image';
-  const modeOptions: { value: Mode; label: string }[] = [
-    { value: 'manual', label: 'Manual' },
-    { value: 'image', label: 'From image' },
-  ];
+  const modeOptions = $derived<{ value: Mode; label: string }[]>([
+    { value: 'manual', label: t('color.manual') },
+    { value: 'image', label: t('color.image') },
+  ]);
 
   // Number of pixels shown in the magnifier in each direction
   const CELLS = 11;
@@ -400,10 +401,10 @@
 </script>
 
 <div class="content-inner fade-up">
-  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> All tools</button>
+  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> {t('menu.allTools')}</button>
   <div class="page-head">
-    <div class="eyebrow">Inspect</div>
-    <h1 class="page-title"><b>Color picker</b></h1>
+    <div class="eyebrow">{t('eyebrow.inspect')}</div>
+    <h1 class="page-title"><b>{t('color.title')}</b></h1>
   </div>
 
   <div style="margin-bottom:20px">
@@ -417,7 +418,7 @@
         <div style="margin-top:20px">
           <label class="color-pick-btn">
             <span class="color-pick-swatch" style="background:{hex}"></span>
-            Pick a color
+            {t('color.pick')}
             <input
               type="color"
               value={hex}
@@ -427,7 +428,7 @@
           </label>
         </div>
         <div style="margin-top:22px">
-          <div class="field-label" style="margin-bottom:12px">Brand swatches</div>
+          <div class="field-label" style="margin-bottom:12px">{t('color.swatches')}</div>
           <div class="swatch-row">
             {#each brand as c (c)}
               <button class="swatch" style="background:{c}" onclick={() => (hex = c)} title={c} aria-label={c}></button>
@@ -448,7 +449,7 @@
             style="margin-top:16px"
           >
             <ImageUp size={26} />
-            <span>Click, drag or paste an image</span>
+            <span>{t('color.drop')}</span>
             <input type="file" accept="image/*" style="display:none" onchange={handleFileInput} />
           </label>
         {:else}
@@ -483,11 +484,11 @@
           <div class="image-mode-actions">
             <span class="image-hint">
               <ZoomIn size={12} />
-              Scroll to zoom · double-click to reset
+              {t('color.hint')}
             </span>
             <button class="change-image-btn" onclick={resetImage}>
               <RotateCcw size={12} />
-              Change image
+              {t('color.change')}
             </button>
           </div>
         {/if}
@@ -495,7 +496,7 @@
     </div>
 
     <div class="panel">
-      <div class="field-label" style="margin-bottom:16px">Values</div>
+      <div class="field-label" style="margin-bottom:16px">{t('color.values')}</div>
       <div style="display:flex;flex-direction:column;gap:12px">
         {#each [
           { k: 'HEX', val: hexInput, copy: activeHex.toUpperCase() },
@@ -514,7 +515,7 @@
                 onkeydown={onValueKeyDown}
                 spellcheck={false}
               />
-              <button class="copy-mini" onclick={() => copy(row.copy)} title="Copy" aria-label="Copy {row.k}">
+              <button class="copy-mini" onclick={() => copy(row.copy)} title={t('common.copy')} aria-label={t('color.copyAria', { k: row.k })}>
                 <Copy size={15} />
               </button>
             </span>

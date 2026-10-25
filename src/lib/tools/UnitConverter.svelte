@@ -2,6 +2,7 @@
   import { ArrowLeft, ArrowLeftRight, Copy } from 'lucide-svelte';
   import Button from '../components/Button.svelte';
   import Segmented from '../components/Segmented.svelte';
+  import { locale, type MessageKey, t } from '../i18n.svelte';
   import { copy } from '../toast';
 
   const UNIT_DATA: Record<string, { units: Record<string, number> }> = {
@@ -53,7 +54,7 @@
     return (n * f) / t;
   });
 
-  const fmt = (x: number) => x.toLocaleString('en-US', { maximumFractionDigits: 6 });
+  const fmt = (x: number) => x.toLocaleString(locale(), { maximumFractionDigits: 6 });
 
   function swap() {
     [from, to] = [to, from];
@@ -61,16 +62,16 @@
 </script>
 
 <div class="content-inner fade-up">
-  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> All tools</button>
+  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> {t('menu.allTools')}</button>
   <div class="page-head">
-    <div class="eyebrow">Convert</div>
-    <h1 class="page-title"><b>Unit converter</b></h1>
+    <div class="eyebrow">{t('eyebrow.convert')}</div>
+    <h1 class="page-title"><b>{t('unit.title')}</b></h1>
   </div>
 
   <div class="panel">
     <div style="margin-bottom:24px">
       <Segmented
-        options={cats.map((c) => ({ value: c, label: c }))}
+        options={cats.map((c) => ({ value: c, label: t(`cat.${c}` as MessageKey) }))}
         value={cat}
         onChange={(c) => (cat = c)}
       />
@@ -78,21 +79,21 @@
 
     <div class="swap-row">
       <div class="field" style="flex:1">
-        <span class="field-label">From</span>
+        <span class="field-label">{t('common.from')}</span>
         <div class="unit-field">
           <input value={val} inputmode="decimal" oninput={(e) => (val = e.currentTarget.value)} />
           <select class="unit-select" bind:value={from}>
-            {#each units as u (u)}<option>{u}</option>{/each}
+            {#each units as u (u)}<option value={u}>{t(`unit.${u}` as MessageKey)}</option>{/each}
           </select>
         </div>
       </div>
-      <button class="swap-btn" onclick={swap} title="Swap"><ArrowLeftRight size={17} /></button>
+      <button class="swap-btn" onclick={swap} title={t('common.swap')}><ArrowLeftRight size={17} /></button>
       <div class="field" style="flex:1">
-        <span class="field-label">To</span>
+        <span class="field-label">{t('common.to')}</span>
         <div class="unit-field">
           <input value={result === null ? '' : fmt(result)} readonly />
           <select class="unit-select" bind:value={to}>
-            {#each units as u (u)}<option>{u}</option>{/each}
+            {#each units as u (u)}<option value={u}>{t(`unit.${u}` as MessageKey)}</option>{/each}
           </select>
         </div>
       </div>
@@ -104,14 +105,14 @@
     style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"
   >
     <div>
-      <div class="field-label" style="margin-bottom:12px">Result</div>
+      <div class="field-label" style="margin-bottom:12px">{t('common.result')}</div>
       <div class="readout conv-readout">
         {result === null ? '—' : fmt(result)}
-        <span class="conv-unit">{to.toLowerCase()}</span>
+        <span class="conv-unit">{t(`unit.${to}` as MessageKey).toLowerCase()}</span>
       </div>
     </div>
     <Button variant="primary" icon={Copy} onclick={() => result !== null && copy(fmt(result))}>
-      Copy result
+      {t('common.copyResult')}
     </Button>
   </div>
 </div>

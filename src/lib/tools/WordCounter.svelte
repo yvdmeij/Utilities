@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ArrowLeft, Clock, Copy, Eraser } from 'lucide-svelte';
   import Button from '../components/Button.svelte';
+  import { locale, t } from '../i18n.svelte';
   import { copy } from '../toast';
 
   let { onBack }: { onBack: () => void } = $props();
@@ -14,18 +15,18 @@
   const readMin = $derived(Math.max(words ? 1 : 0, Math.round(words / 200)));
 
   const stats = $derived([
-    { n: words.toLocaleString(), l: 'Words' },
-    { n: chars.toLocaleString(), l: 'Characters' },
-    { n: noSpace.toLocaleString(), l: 'No spaces' },
-    { n: sentences.toLocaleString(), l: 'Sentences' },
+    { n: words.toLocaleString(locale()), l: t('counter.words') },
+    { n: chars.toLocaleString(locale()), l: t('counter.characters') },
+    { n: noSpace.toLocaleString(locale()), l: t('counter.noSpaces') },
+    { n: sentences.toLocaleString(locale()), l: t('counter.sentences') },
   ]);
 </script>
 
 <div class="content-inner fade-up">
-  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> All tools</button>
+  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> {t('menu.allTools')}</button>
   <div class="page-head">
-    <div class="eyebrow">Write</div>
-    <h1 class="page-title"><b>Word counter</b></h1>
+    <div class="eyebrow">{t('eyebrow.write')}</div>
+    <h1 class="page-title"><b>{t('counter.title')}</b></h1>
   </div>
 
   <div class="panel">
@@ -35,22 +36,22 @@
       {/each}
     </div>
     <div class="field bare-field">
-      <span class="field-label">Your text</span>
+      <span class="field-label">{t('counter.yourText')}</span>
       <textarea
         class="textarea"
         bind:value={text}
-        placeholder="Paste or type your text here…"
+        placeholder={t('counter.placeholder')}
       ></textarea>
     </div>
     <div
       style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;flex-wrap:wrap;gap:12px"
     >
       <span class="ds-body-sm muted" style="display:inline-flex;align-items:center;gap:6px">
-        <Clock size={14} /> ~{readMin} min read
+        <Clock size={14} /> {t('counter.readTime', { n: readMin })}
       </span>
       <div style="display:flex;gap:10px">
-        <Button variant="ghost" icon={Eraser} onclick={() => (text = '')}>Clear</Button>
-        <Button variant="primary" icon={Copy} onclick={() => copy(text)}>Copy text</Button>
+        <Button variant="ghost" icon={Eraser} onclick={() => (text = '')}>{t('counter.clear')}</Button>
+        <Button variant="primary" icon={Copy} onclick={() => copy(text)}>{t('common.copyText')}</Button>
       </div>
     </div>
   </div>
