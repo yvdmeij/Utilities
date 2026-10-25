@@ -1,12 +1,27 @@
 <script lang="ts">
-  import { ArrowLeft, Copy, ImageUp, RotateCcw, ZoomIn } from 'lucide-svelte';
+  import { ArrowLeft, Copy, Image as ImageIcon, ImageUp, Pipette, RotateCcw, ZoomIn } from 'lucide-svelte';
   import { t } from '../i18n.svelte';
   import { copy } from '../toast';
   import Segmented from '../components/Segmented.svelte';
+  import Seg from '../components/glass/Seg.svelte';
+  import ToolPage from '../components/glass/ToolPage.svelte';
+  import { design } from '../design.svelte';
 
   let { onBack }: { onBack: () => void } = $props();
 
   const brand = ['#A9503B', '#CE8A52', '#E6E0D2', '#91A38D', '#5E7B8E', '#41506E', '#2C2D35', '#CBB9A4'];
+
+  const glassSwatches = [
+    '#FF6D29',
+    '#FF8A52',
+    '#C94A12',
+    '#453027',
+    '#2A1F1C',
+    '#161316',
+    '#BABABA',
+    '#E4E2E1',
+    '#FFFFFF',
+  ];
 
   type Mode = 'manual' | 'image';
   const modeOptions = $derived<{ value: Mode; label: string }[]>([
@@ -19,7 +34,7 @@
   // Magnifier canvas size in CSS/HTML pixels — each cell is MAG_SIZE/CELLS px wide
   const MAG_SIZE = 165;
 
-  let hex = $state('#B49A78');
+  let hex = $state(design.current === 'glass' ? '#FF6D29' : '#B49A78');
   let mode = $state<Mode>('manual');
   let imageLoaded = $state(false);
   let hoverHex = $state<string | null>(null);
@@ -400,64 +415,54 @@
   }
 </script>
 
-<div class="content-inner fade-up">
-  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> {t('menu.allTools')}</button>
-  <div class="page-head">
-    <div class="eyebrow">{t('eyebrow.inspect')}</div>
-    <h1 class="page-title"><b>{t('color.title')}</b></h1>
-  </div>
-
-  <div style="margin-bottom:20px">
-    <Segmented options={modeOptions} value={mode} onChange={(v) => (mode = v)} />
-  </div>
-
-  <div class="grid-2">
-    <div class="panel">
+{#if design.current === 'glass'}
+  <ToolPage {onBack} eyebrow={t('eyebrow.inspect')} title={t('color.title')}>
+    <div class="qk-card">
+      <Seg options={modeOptions} value={mode} onChange={(v) => (mode = v)} />
       {#if mode === 'manual'}
-        <div class="color-preview" style="background:{hex}"></div>
-        <div style="margin-top:20px">
-          <label class="color-pick-btn">
-            <span class="color-pick-swatch" style="background:{hex}"></span>
-            {t('color.pick')}
-            <input
-              type="color"
-              value={hex}
-              oninput={(e) => (hex = e.currentTarget.value)}
-              style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer"
-            />
+        <div class="qk-color-preview" style:background={hex}>
+          <label class="qk-btn qk-btn-secondary qk-pick">
+            <input type="color" value={hex} oninput={(e) => (hex = e.currentTarget.value)} />
+            <Pipette size={16} strokeWidth={1.75} />{t('color.pick')}
           </label>
         </div>
-        <div style="margin-top:22px">
-          <div class="field-label" style="margin-bottom:12px">{t('color.swatches')}</div>
-          <div class="swatch-row">
-            {#each brand as c (c)}
-              <button class="swatch" style="background:{c}" onclick={() => (hex = c)} title={c} aria-label={c}></button>
+        <div class="qk-field">
+          <span class="qk-label">{t('color.swatches')}</span>
+          <div class="qk-swatches">
+            {#each glassSwatches as c (c)}
+              <button
+                class="qk-swatch {c === hex.toUpperCase() ? 'on' : ''}"
+                style:background={c}
+                onclick={() => (hex = c)}
+                title={c}
+                aria-label={c}
+              ></button>
             {/each}
           </div>
         </div>
       {:else}
-        <canvas bind:this={sourceCanvas} style="position:absolute;width:0;height:0;visibility:hidden" aria-hidden="true"></canvas>
-        <div class="color-preview" style="background:{activeHex}"></div>
-
+        <canvas
+          bind:this={sourceCanvas}
+          style="position:absolute;width:0;height:0;visibility:hidden"
+          aria-hidden="true"
+        ></canvas>
         {#if !imageLoaded}
           <label
-            class="image-drop-zone"
-            class:dragover={dragOver}
+            class="qk-drop {dragOver ? 'dragover' : ''}"
             ondrop={handleDrop}
             ondragover={handleDragOver}
             ondragleave={() => (dragOver = false)}
-            style="margin-top:16px"
           >
-            <ImageUp size={26} />
+            <ImageIcon size={28} strokeWidth={1.5} />
             <span>{t('color.drop')}</span>
-            <input type="file" accept="image/*" style="display:none" onchange={handleFileInput} />
+            <input type="file" accept="image/*" hidden onchange={handleFileInput} />
           </label>
         {:else}
-          <div class="image-picker-wrap" style="margin-top:16px">
-            <div class="canvas-wrapper">
+          <div class="qk-canvas-wrap">
+            <div class="qk-canvas-inner">
               <canvas
                 bind:this={displayCanvas}
-                class="image-canvas"
+                class="qk-canvas"
                 onmousemove={onCanvasMouseMove}
                 onclick={onCanvasClick}
                 onmouseleave={onCanvasLeave}
@@ -465,11 +470,11 @@
               ></canvas>
             </div>
             {#if zoom > 1.05}
-              <div class="zoom-badge">{zoom.toFixed(zoom < 10 ? 1 : 0)}×</div>
+              <div class="qk-zoom">{zoom.toFixed(zoom < 10 ? 1 : 0)}×</div>
             {/if}
             <canvas
               bind:this={magnifierCanvas}
-              class="magnifier-canvas"
+              class="qk-magnifier"
               style:display={magnifierVisible ? 'block' : 'none'}
               style:top="{magnifierY}px"
               style:left="{magnifierX}px"
@@ -481,47 +486,177 @@
               onmouseleave={onMagnifierLeave}
             ></canvas>
           </div>
-          <div class="image-mode-actions">
-            <span class="image-hint">
-              <ZoomIn size={12} />
-              {t('color.hint')}
-            </span>
-            <button class="change-image-btn" onclick={resetImage}>
-              <RotateCcw size={12} />
-              {t('color.change')}
+          <div class="qk-row-between">
+            <span class="qk-meta qk-inline"><ZoomIn size={13} strokeWidth={1.75} />{t('color.hint')}</span>
+            <button class="qk-btn qk-btn-secondary" onclick={resetImage}>
+              <ImageIcon size={16} strokeWidth={1.75} />{t('color.change')}
             </button>
           </div>
         {/if}
       {/if}
     </div>
 
-    <div class="panel">
-      <div class="field-label" style="margin-bottom:16px">{t('color.values')}</div>
-      <div style="display:flex;flex-direction:column;gap:12px">
+    <div class="qk-card">
+      <div class="qk-card-head">
+        <span class="qk-label">{t('color.values')}</span>
+        <span class="qk-chip-sw" style:background={activeHex}></span>
+      </div>
+      <div class="qk-list">
         {#each [
           { k: 'HEX', val: hexInput, copy: activeHex.toUpperCase() },
           { k: 'RGB', val: rgbInput, copy: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})` },
           { k: 'HSL', val: hslInput, copy: `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)` },
         ] as row (row.k)}
-          <div class="code-row">
-            <span class="k">{row.k}</span>
-            <span style="display:flex;align-items:center;gap:8px;min-width:0">
-              <input
-                class="v-input"
-                value={row.val}
-                onfocus={() => onValueFocus(row.k)}
-                oninput={(e) => onValueInput(row.k, e.currentTarget.value)}
-                onblur={onValueBlur}
-                onkeydown={onValueKeyDown}
-                spellcheck={false}
-              />
-              <button class="copy-mini" onclick={() => copy(row.copy)} title={t('common.copy')} aria-label={t('color.copyAria', { k: row.k })}>
-                <Copy size={15} />
-              </button>
-            </span>
+          <div class="qk-list-row">
+            <span class="qk-code">{row.k}</span>
+            <input
+              class="qk-list-val qk-grow"
+              value={row.val}
+              onfocus={() => onValueFocus(row.k)}
+              oninput={(e) => onValueInput(row.k, e.currentTarget.value)}
+              onblur={onValueBlur}
+              onkeydown={onValueKeyDown}
+              spellcheck={false}
+              aria-label={row.k}
+            />
+            <button
+              class="qk-ibtn sm"
+              onclick={() => copy(row.copy)}
+              title={t('common.copy')}
+              aria-label={t('color.copyAria', { k: row.k })}
+            >
+              <Copy size={15} strokeWidth={1.75} />
+            </button>
           </div>
         {/each}
       </div>
     </div>
+  </ToolPage>
+{:else}
+
+  <div class="content-inner fade-up">
+    <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> {t('menu.allTools')}</button>
+    <div class="page-head">
+      <div class="eyebrow">{t('eyebrow.inspect')}</div>
+      <h1 class="page-title"><b>{t('color.title')}</b></h1>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <Segmented options={modeOptions} value={mode} onChange={(v) => (mode = v)} />
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        {#if mode === 'manual'}
+          <div class="color-preview" style="background:{hex}"></div>
+          <div style="margin-top:20px">
+            <label class="color-pick-btn">
+              <span class="color-pick-swatch" style="background:{hex}"></span>
+              {t('color.pick')}
+              <input
+                type="color"
+                value={hex}
+                oninput={(e) => (hex = e.currentTarget.value)}
+                style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer"
+              />
+            </label>
+          </div>
+          <div style="margin-top:22px">
+            <div class="field-label" style="margin-bottom:12px">{t('color.swatches')}</div>
+            <div class="swatch-row">
+              {#each brand as c (c)}
+                <button class="swatch" style="background:{c}" onclick={() => (hex = c)} title={c} aria-label={c}></button>
+              {/each}
+            </div>
+          </div>
+        {:else}
+          <canvas bind:this={sourceCanvas} style="position:absolute;width:0;height:0;visibility:hidden" aria-hidden="true"></canvas>
+          <div class="color-preview" style="background:{activeHex}"></div>
+
+          {#if !imageLoaded}
+            <label
+              class="image-drop-zone"
+              class:dragover={dragOver}
+              ondrop={handleDrop}
+              ondragover={handleDragOver}
+              ondragleave={() => (dragOver = false)}
+              style="margin-top:16px"
+            >
+              <ImageUp size={26} />
+              <span>{t('color.drop')}</span>
+              <input type="file" accept="image/*" style="display:none" onchange={handleFileInput} />
+            </label>
+          {:else}
+            <div class="image-picker-wrap" style="margin-top:16px">
+              <div class="canvas-wrapper">
+                <canvas
+                  bind:this={displayCanvas}
+                  class="image-canvas"
+                  onmousemove={onCanvasMouseMove}
+                  onclick={onCanvasClick}
+                  onmouseleave={onCanvasLeave}
+                  ondblclick={onCanvasDoubleClick}
+                ></canvas>
+              </div>
+              {#if zoom > 1.05}
+                <div class="zoom-badge">{zoom.toFixed(zoom < 10 ? 1 : 0)}×</div>
+              {/if}
+              <canvas
+                bind:this={magnifierCanvas}
+                class="magnifier-canvas"
+                style:display={magnifierVisible ? 'block' : 'none'}
+                style:top="{magnifierY}px"
+                style:left="{magnifierX}px"
+                width={MAG_SIZE}
+                height={MAG_SIZE}
+                onmouseenter={onMagnifierEnter}
+                onmousemove={onMagnifierMouseMove}
+                onclick={onMagnifierClick}
+                onmouseleave={onMagnifierLeave}
+              ></canvas>
+            </div>
+            <div class="image-mode-actions">
+              <span class="image-hint">
+                <ZoomIn size={12} />
+                {t('color.hint')}
+              </span>
+              <button class="change-image-btn" onclick={resetImage}>
+                <RotateCcw size={12} />
+                {t('color.change')}
+              </button>
+            </div>
+          {/if}
+        {/if}
+      </div>
+
+      <div class="panel">
+        <div class="field-label" style="margin-bottom:16px">{t('color.values')}</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          {#each [
+            { k: 'HEX', val: hexInput, copy: activeHex.toUpperCase() },
+            { k: 'RGB', val: rgbInput, copy: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})` },
+            { k: 'HSL', val: hslInput, copy: `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)` },
+          ] as row (row.k)}
+            <div class="code-row">
+              <span class="k">{row.k}</span>
+              <span style="display:flex;align-items:center;gap:8px;min-width:0">
+                <input
+                  class="v-input"
+                  value={row.val}
+                  onfocus={() => onValueFocus(row.k)}
+                  oninput={(e) => onValueInput(row.k, e.currentTarget.value)}
+                  onblur={onValueBlur}
+                  onkeydown={onValueKeyDown}
+                  spellcheck={false}
+                />
+                <button class="copy-mini" onclick={() => copy(row.copy)} title={t('common.copy')} aria-label={t('color.copyAria', { k: row.k })}>
+                  <Copy size={15} />
+                </button>
+              </span>
+            </div>
+          {/each}
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+{/if}

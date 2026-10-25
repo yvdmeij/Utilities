@@ -1,7 +1,10 @@
 <script lang="ts">
-  import { ArrowLeft, Copy, RefreshCw } from 'lucide-svelte';
+  import { ArrowLeft, Check, Copy, RefreshCw } from 'lucide-svelte';
   import Button from '../components/Button.svelte';
   import Segmented from '../components/Segmented.svelte';
+  import Seg from '../components/glass/Seg.svelte';
+  import ToolPage from '../components/glass/ToolPage.svelte';
+  import { design } from '../design.svelte';
   import { t } from '../i18n.svelte';
   import { copy } from '../toast';
 
@@ -40,53 +43,101 @@
   }
 </script>
 
-<div class="content-inner fade-up">
-  <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> {t('menu.allTools')}</button>
-  <div class="page-head">
-    <div class="eyebrow">{t('eyebrow.generate')}</div>
-    <h1 class="page-title"><b>{t('guid.title')}</b></h1>
-  </div>
-
-  <div class="panel">
-    <div style="margin-bottom:26px">
-      <div class="field-label" style="margin-bottom:11px">{t('guid.howMany')}</div>
-      <Segmented
-        options={[
-          { value: 1, label: '1' },
-          { value: 5, label: '5' },
-          { value: 10, label: '10' },
-          { value: 25, label: '25' },
-        ]}
-        value={count}
-        onChange={pick}
-      />
-    </div>
-
-    <div
-      style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:30px"
-    >
-      <div>
-        <div class="field-label" style="margin-bottom:11px">{t('guid.format')}</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <Button variant={upper ? 'primary' : 'ghost'} onclick={() => (upper = !upper)}>
-            {t('guid.uppercase')}
-          </Button>
-          <Button variant={hyphens ? 'primary' : 'ghost'} onclick={() => (hyphens = !hyphens)}>
-            {t('guid.hyphens')}
-          </Button>
+{#if design.current === 'glass'}
+  <ToolPage {onBack} eyebrow={t('eyebrow.generate')} title={t('guid.title')}>
+    <div class="qk-card">
+      <div class="qk-row-between" style="align-items:flex-end">
+        <div class="qk-field">
+          <span class="qk-label">{t('guid.howMany')}</span>
+          <Seg
+            options={[1, 5, 10, 25].map((n) => ({ value: n, label: String(n) }))}
+            value={count}
+            onChange={pick}
+          />
+        </div>
+        <div class="qk-field">
+          <span class="qk-label">{t('guid.format')}</span>
+          <div class="qk-actions" style="gap:6px">
+            <button class="qk-chip {upper ? 'on' : ''}" aria-pressed={upper} onclick={() => (upper = !upper)}>
+              {#if upper}<Check size={13} strokeWidth={2.2} />{/if}{t('guid.uppercase')}
+            </button>
+            <button class="qk-chip {hyphens ? 'on' : ''}" aria-pressed={hyphens} onclick={() => (hyphens = !hyphens)}>
+              {#if hyphens}<Check size={13} strokeWidth={2.2} />{/if}{t('guid.hyphens')}
+            </button>
+          </div>
         </div>
       </div>
-      <div style="display:flex;gap:10px">
-        <Button variant="secondary" icon={RefreshCw} onclick={regenerate}>{t('guid.regenerate')}</Button>
-        <Button variant="primary" icon={Copy} onclick={() => text && copy(text)}>{t('guid.copyAll')}</Button>
+      <div class="qk-actions">
+        <button class="qk-btn qk-btn-secondary" onclick={regenerate}>
+          <RefreshCw size={16} strokeWidth={1.75} />{t('guid.regenerate')}
+        </button>
+        <button class="qk-btn qk-btn-primary" onclick={() => text && copy(text)}>
+          <Copy size={16} strokeWidth={1.75} />{t('guid.copyAll')}
+        </button>
       </div>
     </div>
+    <div class="qk-card">
+      <div class="qk-card-head">
+        <span class="qk-label">{count === 1 ? t('common.result') : t('guid.count', { n: count })}</span>
+        <span class="qk-meta">{t('guid.clickToCopy')}</span>
+      </div>
+      <div class="qk-guids">
+        {#each formatted as g, i (i)}
+          <button class="qk-guid" onclick={() => copy(g)}>{g}</button>
+        {/each}
+      </div>
+    </div>
+  </ToolPage>
+{:else}
 
-    <div class="field-label" style="margin-bottom:13px">{count === 1 ? t('common.result') : t('guid.count', { n: count })}</div>
-    <div class="guid-list">
-      {#each formatted as g, i (i)}
-        <button class="guid-line" onclick={() => copy(g)} title={t('guid.clickToCopy')}>{g}</button>
-      {/each}
+  <div class="content-inner fade-up">
+    <button class="back-btn" onclick={onBack}><ArrowLeft size={16} /> {t('menu.allTools')}</button>
+    <div class="page-head">
+      <div class="eyebrow">{t('eyebrow.generate')}</div>
+      <h1 class="page-title"><b>{t('guid.title')}</b></h1>
+    </div>
+
+    <div class="panel">
+      <div style="margin-bottom:26px">
+        <div class="field-label" style="margin-bottom:11px">{t('guid.howMany')}</div>
+        <Segmented
+          options={[
+            { value: 1, label: '1' },
+            { value: 5, label: '5' },
+            { value: 10, label: '10' },
+            { value: 25, label: '25' },
+          ]}
+          value={count}
+          onChange={pick}
+        />
+      </div>
+
+      <div
+        style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:30px"
+      >
+        <div>
+          <div class="field-label" style="margin-bottom:11px">{t('guid.format')}</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <Button variant={upper ? 'primary' : 'ghost'} onclick={() => (upper = !upper)}>
+              {t('guid.uppercase')}
+            </Button>
+            <Button variant={hyphens ? 'primary' : 'ghost'} onclick={() => (hyphens = !hyphens)}>
+              {t('guid.hyphens')}
+            </Button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <Button variant="secondary" icon={RefreshCw} onclick={regenerate}>{t('guid.regenerate')}</Button>
+          <Button variant="primary" icon={Copy} onclick={() => text && copy(text)}>{t('guid.copyAll')}</Button>
+        </div>
+      </div>
+
+      <div class="field-label" style="margin-bottom:13px">{count === 1 ? t('common.result') : t('guid.count', { n: count })}</div>
+      <div class="guid-list">
+        {#each formatted as g, i (i)}
+          <button class="guid-line" onclick={() => copy(g)} title={t('guid.clickToCopy')}>{g}</button>
+        {/each}
+      </div>
     </div>
   </div>
-</div>
+{/if}

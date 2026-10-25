@@ -1,4 +1,5 @@
-import './app.css';
+// Injects the active design's stylesheet before the app mounts.
+import './lib/design.svelte';
 import { mount } from 'svelte';
 import App from './App.svelte';
 
