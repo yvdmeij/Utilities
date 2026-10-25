@@ -139,18 +139,12 @@ const FETCHERS: Record<RateSource, (res: Response) => Promise<RateData>> = {
     return { rateDate, rates: onlyKnown({ ...data.rates, USD: 1 }) };
   },
   norgesbank: async (res) => parseNorgesBank(await res.json()),
-  // ECB reference rates via Frankfurter — business days only.
-  frankfurter: async (res) => {
-    const data = await res.json();
-    return { rateDate: data.date, rates: onlyKnown({ EUR: 1, ...data.rates }) };
-  },
 };
 
 const URLS: Record<RateSource, string> = {
   erapi: 'https://open.er-api.com/v6/latest/USD',
   norgesbank:
     'https://data.norges-bank.no/api/data/EXR/B..NOK.SP?format=sdmx-json&lastNObservations=1&locale=en',
-  frankfurter: 'https://api.frankfurter.dev/v1/latest?base=EUR',
 };
 
 /**

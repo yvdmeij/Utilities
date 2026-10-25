@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Check, Settings } from 'lucide-svelte';
+  import { Check, Languages } from 'lucide-svelte';
   import { i18n, LANGS, setLang, t } from '../i18n.svelte';
 
   let open = $state(false);
@@ -14,16 +14,16 @@
   <button
     class="theme-toggle"
     onclick={() => (open = !open)}
-    aria-label={t('settings.title')}
+    aria-label={t('settings.language')}
     aria-expanded={open}
   >
-    <Settings size={17} strokeWidth={1.75} />
+    <Languages size={17} strokeWidth={1.75} />
   </button>
 
   {#if open}
     <button class="menu-scrim" aria-label={t('menu.close')} onclick={() => (open = false)}></button>
 
-    <div class="menu-pop settings-pop">
+    <div class="menu-pop language-pop">
       <div class="menu-sec">
         <span class="ms-label">{t('settings.language')}</span>
       </div>

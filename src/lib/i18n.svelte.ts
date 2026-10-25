@@ -6,7 +6,7 @@ export const LANGS: { id: Lang; label: string }[] = [
   { id: 'nl', label: 'Nederlands' },
 ];
 
-export type RateSource = 'erapi' | 'norgesbank' | 'frankfurter';
+export type RateSource = 'erapi' | 'norgesbank';
 
 /** Per-language formatting and currency defaults. */
 export const LANG_CONFIG: Record<
@@ -34,7 +34,7 @@ export const LANG_CONFIG: Record<
     locale: 'nl-NL',
     baseCurrency: 'EUR',
     secondCurrency: 'USD',
-    source: 'frankfurter',
+    source: 'erapi',
   },
 };
 
@@ -81,9 +81,7 @@ const en = {
   'tool.case.desc': 'Upper · Lower · Title',
   'tool.base64.name': 'Base64',
   'tool.base64.desc': 'Encode · Decode',
-  'badge.new': 'New',
 
-  'app.tagline': 'Everyday utilities',
   'menu.allTools': 'All tools',
   'menu.tools': 'Tools',
   'menu.menu': 'Menu',
@@ -139,7 +137,6 @@ const en = {
   'currency.toggleFavorite': 'Toggle favorite',
   'currency.sourceErapi': 'Rates by ExchangeRate-API',
   'currency.sourceNorgesbank': 'Norges Bank',
-  'currency.sourceFrankfurter': 'ECB via Frankfurter',
 
   'color.title': 'Color picker',
   'color.manual': 'Manual',
@@ -246,9 +243,7 @@ const nb: Messages = {
   'tool.case.desc': 'Store · Små · Tittel',
   'tool.base64.name': 'Base64',
   'tool.base64.desc': 'Kod · Dekod',
-  'badge.new': 'Ny',
 
-  'app.tagline': 'Hverdagsverktøy',
   'menu.allTools': 'Alle verktøy',
   'menu.tools': 'Verktøy',
   'menu.menu': 'Meny',
@@ -304,7 +299,6 @@ const nb: Messages = {
   'currency.toggleFavorite': 'Veksle favoritt',
   'currency.sourceErapi': 'Kurser fra ExchangeRate-API',
   'currency.sourceNorgesbank': 'Norges Bank',
-  'currency.sourceFrankfurter': 'ECB via Frankfurter',
 
   'color.title': 'Fargevelger',
   'color.manual': 'Manuell',
@@ -392,11 +386,11 @@ const nb: Messages = {
 };
 
 const nl: Messages = {
-  'tool.currency.name': 'Valutaomrekenaar',
+  'tool.currency.name': 'Valuta',
   'tool.currency.desc': 'EUR · USD · GBP',
   'tool.color.name': 'Kleurkiezer',
   'tool.color.desc': 'HEX · RGB · HSL',
-  'tool.converter.name': 'Eenhedenomrekenaar',
+  'tool.converter.name': 'Eenheden',
   'tool.converter.desc': 'Lengte · Gewicht · Volume',
   'tool.guid.name': 'GUID-generator',
   'tool.guid.desc': 'UUID v4',
@@ -404,13 +398,11 @@ const nl: Messages = {
   'tool.timer.desc': 'Focus · Aftellen',
   'tool.counter.name': 'Woordenteller',
   'tool.counter.desc': 'Woorden · Tekens',
-  'tool.case.name': 'Hoofdletteromzetter',
+  'tool.case.name': 'Hoofdletters',
   'tool.case.desc': 'Hoofd · Klein · Titel',
   'tool.base64.name': 'Base64',
   'tool.base64.desc': 'Coderen · Decoderen',
-  'badge.new': 'Nieuw',
 
-  'app.tagline': 'Handige hulpmiddelen',
   'menu.allTools': 'Alle tools',
   'menu.tools': 'Tools',
   'menu.menu': 'Menu',
@@ -447,7 +439,7 @@ const nl: Messages = {
   'eyebrow.transform': 'Omzetten',
   'eyebrow.encode': 'Coderen',
 
-  'currency.title': 'Valutaomrekenaar',
+  'currency.title': 'Valuta',
   'currency.fetching': 'Laatste koersen ophalen…',
   'currency.unavailable': 'Koersen niet beschikbaar',
   'currency.retry': 'Opnieuw proberen',
@@ -466,7 +458,6 @@ const nl: Messages = {
   'currency.toggleFavorite': 'Favoriet wisselen',
   'currency.sourceErapi': 'Koersen van ExchangeRate-API',
   'currency.sourceNorgesbank': 'Norges Bank',
-  'currency.sourceFrankfurter': 'ECB via Frankfurter',
 
   'color.title': 'Kleurkiezer',
   'color.manual': 'Handmatig',
@@ -479,7 +470,7 @@ const nl: Messages = {
   'color.values': 'Waarden',
   'color.copyAria': '{k} kopiëren',
 
-  'unit.title': 'Eenhedenomrekenaar',
+  'unit.title': 'Eenheden',
   'cat.Length': 'Lengte',
   'cat.Weight': 'Gewicht',
   'cat.Volume': 'Volume',
@@ -535,7 +526,7 @@ const nl: Messages = {
   'counter.readTime': '~{n} min leestijd',
   'counter.clear': 'Wissen',
 
-  'case.title': 'Hoofdletteromzetter',
+  'case.title': 'Hoofdletters',
   'case.upper': 'HOOFD',
   'case.lower': 'klein',
   'case.titleCase': 'Titel',

@@ -2,7 +2,7 @@
   import { Moon, Search, Sun, X } from 'lucide-svelte';
   import type { Snippet } from 'svelte';
   import { t } from '../i18n.svelte';
-  import Settings from './Settings.svelte';
+  import LanguageMenu from './LanguageMenu.svelte';
 
   let {
     query,
@@ -88,7 +88,7 @@
         <Moon size={17} strokeWidth={1.75} />
       {/if}
     </button>
-    <Settings />
+    <LanguageMenu />
     {@render left?.()}
   </div>
 </header>

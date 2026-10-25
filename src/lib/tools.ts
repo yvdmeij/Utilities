@@ -14,14 +14,12 @@ import type { IconComponent } from './types';
 export interface Tool {
   id: string;
   icon: IconComponent;
-  badge?: boolean;
 }
 
 export const TOOLS: Tool[] = [
   {
     id: 'currency',
     icon: Banknote,
-    badge: true,
   },
   {
     id: 'color',

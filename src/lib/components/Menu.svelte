@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ChevronRight, Dot, LayoutGrid, Plus, Shapes } from 'lucide-svelte';
+  import { ChevronRight, Dot, LayoutGrid, Plus } from 'lucide-svelte';
   import { type MessageKey, t } from '../i18n.svelte';
   import { TOOLS, toolName } from '../tools';
 
@@ -40,14 +40,6 @@
     <button class="menu-scrim" aria-label={t('menu.close')} onclick={() => (open = false)}></button>
 
     <div class="menu-pop">
-      <div class="menu-head">
-        <div class="brand-mark"><Shapes size={15} /></div>
-        <div>
-          <div class="mh-title">Quietkit</div>
-          <div class="mh-sub">{t('app.tagline')}</div>
-        </div>
-      </div>
-
       <button class="nav-item" onclick={() => go('home')}>
         <LayoutGrid size={18} /><span class="ni-label">{t('menu.allTools')}</span>
       </button>
@@ -98,7 +90,6 @@
               onclick={() => go(tool.id)}
             >
               <Icon size={18} /><span class="ni-label">{toolName(tool.id)}</span>
-              {#if tool.badge}<span class="nav-badge">{t('badge.new')}</span>{/if}
             </button>
           {/if}
         {/each}
