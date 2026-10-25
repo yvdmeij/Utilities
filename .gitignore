@@ -109,8 +109,6 @@ vite.config.ts.timestamp-*
 .vscode-test
 .tern-port
 
-# Claude Code
-.claude/
 
 # Misc
 *.pem
