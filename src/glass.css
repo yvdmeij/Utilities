@@ -1059,6 +1059,9 @@ input.qk-list-val:focus {
   align-items: center;
   gap: 16px;
 }
+.qk-topbar.no-search {
+  grid-template-columns: 1fr auto;
+}
 .qk-brand {
   display: inline-flex;
   align-items: center;

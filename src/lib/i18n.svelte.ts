@@ -81,6 +81,8 @@ const en = {
   'tool.case.desc': 'Upper · Lower · Title',
   'tool.base64.name': 'Base64',
   'tool.base64.desc': 'Encode · Decode',
+  'tool.html2md.name': 'HTML to Markdown',
+  'tool.html2md.desc': 'HTML → Markdown',
 
   'menu.allTools': 'All tools',
   'menu.tools': 'Tools',
@@ -232,6 +234,9 @@ const en = {
   'base64.plain': 'Plain text',
   'base64.paste': 'Paste here…',
   'base64.invalid': 'Not valid Base64',
+
+  'html2md.title': 'HTML to Markdown',
+  'html2md.paste': 'Paste HTML here…',
 } as const;
 
 export type MessageKey = keyof typeof en;
@@ -254,6 +259,8 @@ const nb: Messages = {
   'tool.case.desc': 'Store · Små · Tittel',
   'tool.base64.name': 'Base64',
   'tool.base64.desc': 'Kod · Dekod',
+  'tool.html2md.name': 'HTML til Markdown',
+  'tool.html2md.desc': 'HTML → Markdown',
 
   'menu.allTools': 'Alle verktøy',
   'menu.tools': 'Verktøy',
@@ -405,6 +412,9 @@ const nb: Messages = {
   'base64.plain': 'Ren tekst',
   'base64.paste': 'Lim inn her…',
   'base64.invalid': 'Ugyldig Base64',
+
+  'html2md.title': 'HTML til Markdown',
+  'html2md.paste': 'Lim inn HTML her…',
 };
 
 const nl: Messages = {
@@ -424,6 +434,8 @@ const nl: Messages = {
   'tool.case.desc': 'Hoofd · Klein · Titel',
   'tool.base64.name': 'Base64',
   'tool.base64.desc': 'Coderen · Decoderen',
+  'tool.html2md.name': 'HTML naar Markdown',
+  'tool.html2md.desc': 'HTML → Markdown',
 
   'menu.allTools': 'Alle tools',
   'menu.tools': 'Tools',
@@ -575,6 +587,9 @@ const nl: Messages = {
   'base64.plain': 'Platte tekst',
   'base64.paste': 'Plak hier…',
   'base64.invalid': 'Ongeldige Base64',
+
+  'html2md.title': 'HTML naar Markdown',
+  'html2md.paste': 'Plak HTML hier…',
 };
 
 const MESSAGES: Record<Lang, Messages> = { en, nb, nl };

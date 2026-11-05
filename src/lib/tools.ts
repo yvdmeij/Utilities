@@ -3,6 +3,7 @@ import {
   Binary,
   CaseSensitive,
   Coins,
+  FileCode,
   Fingerprint,
   Hash,
   Palette,
@@ -62,6 +63,11 @@ export const TOOLS: Tool[] = [
     id: 'base64',
     icon: Binary,
     glassIcon: Binary,
+  },
+  {
+    id: 'html2md',
+    icon: FileCode,
+    glassIcon: FileCode,
   },
 ];
 

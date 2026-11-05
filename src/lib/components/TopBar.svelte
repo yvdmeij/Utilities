@@ -24,6 +24,9 @@
   let searchOpen = $state(false);
   let searchEl: HTMLInputElement | undefined = $state();
 
+  // Flip to true once there are enough tools to warrant search.
+  const SHOW_SEARCH = false;
+
   function closeSearch() {
     searchOpen = false;
   }
@@ -49,10 +52,11 @@
 
 {#if design.current === 'glass'}
   <header class="qk-topbar-wrap">
-    <div class="qk-topbar">
+    <div class="qk-topbar" class:no-search={!SHOW_SEARCH}>
       <button class="qk-brand" onclick={() => onHome?.()} aria-label={t('top.home')}>
         {@render logo('qk-logo', '15 -228 1585 290')}
       </button>
+      {#if SHOW_SEARCH}
       <label class="qk-search">
         <Search size={15} strokeWidth={1.75} />
         <input
@@ -76,6 +80,7 @@
           </button>
         {/if}
       </label>
+      {/if}
       <div class="qk-topbar-end">
         <LanguageMenu />
         <button
@@ -95,12 +100,13 @@
     </div>
   </header>
 {:else}
-  <header class="topbar">
+  <header class="topbar" class:no-search={!SHOW_SEARCH}>
     <div class="topbar-side">
       <button class="brand" onclick={() => onHome?.()} aria-label={t('top.home')}>
         {@render logo('brand-logo', '-129 -348 1872 528')}
       </button>
     </div>
+    {#if SHOW_SEARCH}
     <div class="search {searchOpen ? 'search-open' : ''}">
       <input
         bind:this={searchEl}
@@ -111,7 +117,9 @@
         placeholder={t('top.search')}
       />
     </div>
+    {/if}
     <div class="topbar-side topbar-side-end">
+      {#if SHOW_SEARCH}
       <button
         class="search-toggle"
         onmousedown={(e) => e.preventDefault()}
@@ -124,6 +132,7 @@
           <Search size={17} strokeWidth={1.75} />
         {/if}
       </button>
+      {/if}
       <button
         class="theme-toggle"
         onclick={() => onToggleDark?.()}

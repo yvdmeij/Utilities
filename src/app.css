@@ -377,6 +377,9 @@ textarea {
   display: flex;
   align-items: center;
 }
+.topbar.no-search {
+  grid-template-columns: 1fr auto;
+}
 .topbar-side-end {
   justify-content: flex-end;
 }

@@ -8,6 +8,7 @@
   import ColorTool from './lib/tools/ColorTool.svelte';
   import CurrencyConverter from './lib/tools/CurrencyConverter.svelte';
   import GuidGenerator from './lib/tools/GuidGenerator.svelte';
+  import HtmlToMarkdown from './lib/tools/HtmlToMarkdown.svelte';
   import Home from './lib/tools/Home.svelte';
   import Timer from './lib/tools/Timer.svelte';
   import UnitConverter from './lib/tools/UnitConverter.svelte';
@@ -62,6 +63,8 @@
     <CaseConverter onBack={back} />
   {:else if view === 'base64'}
     <Base64Tool onBack={back} />
+  {:else if view === 'html2md'}
+    <HtmlToMarkdown onBack={back} />
   {/if}
 {/snippet}
 
