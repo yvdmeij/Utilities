@@ -22,12 +22,16 @@ function children(el: Node, inPre = false): string {
 }
 
 function list(el: Element, ordered: boolean): string {
-  const start = ordered ? Number.parseInt(el.getAttribute('start') ?? '1', 10) || 1 : 0;
+  const start = ordered
+    ? Number.parseInt(el.getAttribute('start') ?? '1', 10) || 1
+    : 0;
   const items = Array.from(el.children)
     .filter((c) => c.tagName.toLowerCase() === 'li')
     .map((li, i) => {
       const marker = ordered ? `${start + i}. ` : '- ';
-      const body = children(li).trim().replace(/\n{2,}/g, '\n');
+      const body = children(li)
+        .trim()
+        .replace(/\n{2,}/g, '\n');
       const pad = ' '.repeat(marker.length);
       return marker + body.replace(/\n/g, `\n${pad}`);
     });
@@ -38,11 +42,17 @@ function table(el: Element): string {
   const rows = Array.from(el.querySelectorAll('tr')).map((tr) =>
     Array.from(tr.children)
       .filter((c) => /^(td|th)$/i.test(c.tagName))
-      .map((c) => children(c).trim().replace(/\s*\n+\s*/g, ' ').replace(/\|/g, '\\|'))
+      .map((c) =>
+        children(c)
+          .trim()
+          .replace(/\s*\n+\s*/g, ' ')
+          .replace(/\|/g, '\\|'),
+      ),
   );
   if (!rows.length) return '';
   const cols = Math.max(...rows.map((r) => r.length));
-  const line = (r: string[]) => `| ${Array.from({ length: cols }, (_, i) => r[i] ?? '').join(' | ')} |`;
+  const line = (r: string[]) =>
+    `| ${Array.from({ length: cols }, (_, i) => r[i] ?? '').join(' | ')} |`;
   const sep = `| ${Array.from({ length: cols }, () => '---').join(' | ')} |`;
   return block([line(rows[0]), sep, ...rows.slice(1).map(line)].join('\n'));
 }
@@ -65,7 +75,11 @@ function convert(node: Node, inPre = false): string {
     case 'h4':
     case 'h5':
     case 'h6':
-      return block(`${'#'.repeat(Number(tag[1]))} ${children(el).trim().replace(/\s*\n+\s*/g, ' ')}`);
+      return block(
+        `${'#'.repeat(Number(tag[1]))} ${children(el)
+          .trim()
+          .replace(/\s*\n+\s*/g, ' ')}`,
+      );
     case 'p':
     case 'div':
     case 'section':
@@ -121,7 +135,7 @@ function convert(node: Node, inPre = false): string {
           .trim()
           .split('\n')
           .map((l) => (l ? `> ${l}` : '>'))
-          .join('\n')
+          .join('\n'),
       );
     case 'table':
       return table(el);
